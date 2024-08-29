@@ -1,0 +1,12 @@
+[build]
+command = "yarn build"
+publish = "dist"
+
+[build.environment]
+CI = "false"
+
+# Use the React router instead of the Netlify router.
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
