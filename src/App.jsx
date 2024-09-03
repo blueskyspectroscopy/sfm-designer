@@ -16,6 +16,8 @@ export default function App() {
   const [fM, setFM] = useState(1e5); // Hz.
   const [numberOfMeasurements, setNumberOfMeasurements] = useState(2);
   const [configuration, setConfiguration] = useState(Configuration.SHARED_REFERENCE);
+  const [maxStroke, setMaxStroke] = useState(0.15); // m.
+  const [minSeparation, setMinSeparation] = useState(0.5); // m.
   return (
     <BrowserRouter>
       <Container fluid className="user-select-none">
@@ -26,6 +28,8 @@ export default function App() {
               fM={fM} setFM={setFM}
               numberOfMeasurements={numberOfMeasurements} setNumberOfMeasurements={setNumberOfMeasurements}
               configuration={configuration} setConfiguration={setConfiguration}
+              maxStroke={maxStroke} setMaxStroke={setMaxStroke}
+              minSeparation={minSeparation} setMinSeparation={setMinSeparation}
               />
           </Col>
           <Col className="p-3">
@@ -39,6 +43,8 @@ export default function App() {
               <p>f<sub>m</sub> = {fM} Hz</p>
               <p>Number of measurements = {numberOfMeasurements}</p>
               <p>Configuration = {configuration}</p>
+              <p>Max mechanical stroke = {maxStroke} m</p>
+              <p>Mechanical separation between axes = {minSeparation} m</p>
             </div>
             <Footer />
           </Col>

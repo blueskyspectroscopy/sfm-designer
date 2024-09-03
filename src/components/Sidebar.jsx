@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
@@ -27,12 +27,41 @@ export default function Sidebar({
     fM, setFM,
     numberOfMeasurements, setNumberOfMeasurements,
     configuration, setConfiguration,
+    maxStroke, setMaxStroke,
+    minSeparation, setMinSeparation,
   }) {
-  // Functions to update state from the form.
-  const handleNuA = (e) => setNuA(e.target.value * GHZ_TO_HZ);
+
+  // The minimum separation is automatically updated when the nuA input is
+  // changed. Some extra logic is required for that.
+  const [automaticMinSeparation, setAutomaticMinSeparation] = useState(0);
+  const [automaticMinSeparationOverride, setAutomaticMinSeparationOverride] = useState(false);
+  const handleAutomaticMinSeparation = () => {
+    const c = 299792458; // m/s.
+    const w = 2.5; // Recommended from A. Christiansen PhD thesis: https://hdl.handle.net/10133/6671.
+    const sigma = 0.0225; // TODO Put sigma in a state.
+    const minSepOpd = (w * c) / (2 * Math.sqrt(2) * Math.PI ** 2 * nuA * sigma);
+    // Multiply by 0.5 to convert from optical to mechanical.
+    const minSep = round_to(0.5 * minSepOpd, 2);
+    setAutomaticMinSeparation(minSep);
+    if (!automaticMinSeparationOverride) {
+      setMinSeparation(minSep);
+    }
+  };
+
+  // Functions to update the exported state.
+  const handleNuA = (e) => { setNuA(e.target.value * GHZ_TO_HZ), handleAutomaticMinSeparation() };
   const handleFM = (e) => setFM(e.target.value * KHZ_TO_HZ);
   const handleNumberOfMeasuremnts = (e) => setNumberOfMeasurements(e.target.value);
-  const handleConfgiration = (e) => setConfiguration(e.target.value);
+  const handleConfiguration = (e) => setConfiguration(e.target.value);
+  const handleMaxStroke = (e) => setMaxStroke(e.target.value);
+  const handleMinSeparation = (e) => {
+    if (e.type == 'automaticvalue') {
+      setMinSeparation(e.detail.value);
+    } else {
+      setMinSeparation(e.target.value);
+    }
+  }
+
   return (
     <>
       <nav className="d-block">
@@ -46,17 +75,46 @@ export default function Sidebar({
           A calculator for sinusoidal frequency modulation (SFM) interferometer layouts.
         </p>
       </nav>
-      <Entry type="number" min={0} max={100}  step={0.1} prefix={<>&nu;<sub>A</sub></>} suffix="GHz" value={round_to(nuA * HZ_TO_GHZ, 6)} onChange={handleNuA} aria-label="Optical frequency modulation amplitude" />
-      <Entry type="number" min={0} max={1000} step={1} prefix={<>f<sub>m</sub></>} suffix="kHz" value={round_to(fM * HZ_TO_KHZ, 6)} onChange={handleFM} aria-label="Modulation frequency" />
-      <Dropdown prefix="Number of measurements" value={numberOfMeasurements} onChange={handleNumberOfMeasuremnts} aria-label="Number of desired simultaneous measurements">
+      <Entry
+        type="number" min={0} max={100} step={0.1}
+        prefix={<>&nu;<sub>A</sub></>} suffix="GHz"
+        value={round_to(nuA * HZ_TO_GHZ, 6)} onChange={handleNuA}
+        aria-label="Optical frequency modulation amplitude"
+        />
+      <Entry
+        type="number" min={0} max={1000} step={1}
+        prefix={<>f<sub>m</sub></>} suffix="kHz"
+        value={round_to(fM * HZ_TO_KHZ, 6)} onChange={handleFM}
+        aria-label="Modulation frequency"
+        />
+      <Dropdown
+        prefix="Number of measurements"
+        value={numberOfMeasurements} onChange={handleNumberOfMeasuremnts}
+        aria-label="Number of desired simultaneous measurements"
+        >
         <option value={1}>1</option>
         <option value={2}>2</option>
         <option value={3}>3</option>
       </Dropdown>
-      <Dropdown prefix="Configuration" value={configuration} onChange={handleConfgiration} aria-label="The interferometer configuration style">
+      <Dropdown
+        prefix="Configuration"
+        value={configuration} onChange={handleConfiguration}
+        aria-label="The interferometer configuration style"
+        >
         <option value={Configuration.SHARED_REFERENCE}>Shared reference</option>
         <option value={Configuration.UNIQUE_REFERENCES}>Unique references</option>
       </Dropdown>
+      <Entry
+        type="number" min={0} max={10} step={0.01}
+        prefix={<>&Delta;x<sub>max</sub></>} suffix="m"
+        value={maxStroke} onChange={handleMaxStroke}
+        aria-label="Maximum mechanical stroke to be measured" />
+      <Entry
+        type="number" min={0} max={10} step={0.01}
+        prefix={<>&Delta;x<sub>sep</sub></>} suffix="m"
+        value={minSeparation} onChange={handleMinSeparation}
+        automaticValue={automaticMinSeparation} onOverrideChange={setAutomaticMinSeparationOverride}
+        aria-label="Minimum mechanical separation between axes" />
     </>
   );
 }
@@ -70,4 +128,8 @@ Sidebar.propTypes = {
   setNumberOfMeasurements: PropTypes.func.isRequired,
   configuration: PropTypes.number.isRequired,
   setConfiguration: PropTypes.func.isRequired,
+  maxStroke: PropTypes.number.isRequired,
+  setMaxStroke: PropTypes.func.isRequired,
+  minSeparation: PropTypes.number.isRequired,
+  setMinSeparation: PropTypes.func.isRequired,
 };
