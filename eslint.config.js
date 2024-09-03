@@ -34,6 +34,14 @@ export default [
         'warn',
         { allowConstantExport: true },
       ],
+      // This prevents: error  'React' is defined but never used  no-unused-vars
+      // errors from being caught by the linter.
+      'no-unused-vars': [
+        'error',
+        {
+          'varsIgnorePattern': 'React'
+        }
+      ]
     },
   },
   {
