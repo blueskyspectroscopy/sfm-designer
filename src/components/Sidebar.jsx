@@ -6,6 +6,7 @@ import Configuration from '../model/Configuration';
 import Dropdown from './Dropdown';
 import Entry from './Entry';
 import Logo from '../assets/logo.svg?react';
+import SOLUTIONS from '../model/Solutions';
 
 /* eslint-disable no-unused-vars */
 const HZ_TO_KHZ = 1e-3;
@@ -17,9 +18,21 @@ const GHZ_TO_HZ = 1e9;
 /* eslint-enable no-unused-vars */
 
 // n is the number or descimal places.
-const round_to = (x, n) => {
+const roundTo = (x, n) => {
   const d = 10 ** n;
   return Math.round(d * x) / d;
+}
+
+const computeNumberOfReflections = ({ configuration, numberOfMeasurements }) => {
+  switch (configuration) {
+    case Configuration.SHARED_REFERENCE:
+      return numberOfMeasurements + 1;
+    case Configuration.UNIQUE_REFERENCES:
+      return 2 * numberOfMeasurements;
+    default:
+      console.log(`Invalid configuration: ${configuration}. Defaulting to 2 reflections.`);
+      return 2;
+  }
 }
 
 export default function Sidebar({
@@ -32,6 +45,9 @@ export default function Sidebar({
     solution, setSolution,
   }) {
 
+  // The solution set to draw from.
+  const [numberOfReflections, setNumberOfReflections] = useState(3);
+
   // The minimum separation is automatically updated when the nuA input is
   // changed. Some extra logic is required for that.
   const [automaticMinSeparation, setAutomaticMinSeparation] = useState(0);
@@ -42,19 +58,34 @@ export default function Sidebar({
     const sigma = 0.0225; // TODO Put sigma in a state.
     const minSepOpd = (w * c) / (2 * Math.sqrt(2) * Math.PI ** 2 * nuA * sigma);
     // Multiply by 0.5 to convert from optical to mechanical.
-    const minSep = round_to(0.5 * minSepOpd, 2);
+    const minSep = roundTo(0.5 * minSepOpd, 2);
     setAutomaticMinSeparation(minSep);
     if (!automaticMinSeparationOverride) {
       setMinSeparation(minSep);
     }
   };
 
-  // TODO: move round_to calls into here.
+  // TODO: move roundTo calls into here.
   // Functions to update the exported state.
-  const handleNuA = (e) => { setNuA(e.target.value * GHZ_TO_HZ), handleAutomaticMinSeparation() };
+  const handleNuA = (e) => {
+    setNuA(e.target.value * GHZ_TO_HZ);
+    handleAutomaticMinSeparation();
+  };
   const handleFM = (e) => setFM(e.target.value * KHZ_TO_HZ);
-  const handleNumberOfMeasuremnts = (e) => setNumberOfMeasurements(e.target.value);
-  const handleConfiguration = (e) => setConfiguration(e.target.value);
+  const handleNumberOfMeasuremnts = (e) => {
+    setNumberOfMeasurements(parseInt(e.target.value));
+    setNumberOfReflections(computeNumberOfReflections({
+      configuration, numberOfMeasurements: parseInt(e.target.value)
+    }));
+    setSolution(0);
+  };
+  const handleConfiguration = (e) => {
+    setConfiguration(e.target.value);
+    setNumberOfReflections(computeNumberOfReflections({
+      configuration: e.target.value, numberOfMeasurements,
+    }));
+    setSolution(0);
+  }
   const handleMaxStroke = (e) => setMaxStroke(e.target.value);
   const handleMinSeparation = (e) => {
     if (e.type == 'automaticvalue') {
@@ -81,13 +112,13 @@ export default function Sidebar({
       <Entry
         type="number" min={0} max={100} step={0.1}
         prefix={<>&nu;<sub>A</sub></>} suffix="GHz"
-        value={round_to(nuA * HZ_TO_GHZ, 6)} onChange={handleNuA}
+        value={roundTo(nuA * HZ_TO_GHZ, 6)} onChange={handleNuA}
         aria-label="Optical frequency modulation amplitude"
         />
       <Entry
         type="number" min={0} max={1000} step={1}
         prefix={<>f<sub>m</sub></>} suffix="kHz"
-        value={round_to(fM * HZ_TO_KHZ, 6)} onChange={handleFM}
+        value={roundTo(fM * HZ_TO_KHZ, 6)} onChange={handleFM}
         aria-label="Modulation frequency"
         />
       <Dropdown
@@ -97,8 +128,6 @@ export default function Sidebar({
           { value: 1, name: '1' },
           { value: 2, name: '2' },
           { value: 3, name: '3' },
-          { value: 4, name: '4' },
-          { value: 5, name: '5' },
         ]}
         aria-label="Number of desired simultaneous measurements"
         />
@@ -128,14 +157,7 @@ export default function Sidebar({
         prefix="Solution"
         value={solution} onChange={handleSolution}
         onCycle={setSolution}
-        options={[
-          /* TODO: Populate with correct options */
-          { value: 1, name: '1' },
-          { value: 2, name: '2' },
-          { value: 3, name: '3' },
-          { value: 4, name: '4' },
-          { value: 5, name: '5' },
-        ]}
+        options={SOLUTIONS[numberOfReflections]}
         aria-label="Solution for a number of measurements and configuration"
         />
     </>

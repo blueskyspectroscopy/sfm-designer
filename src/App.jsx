@@ -18,7 +18,7 @@ export default function App() {
   const [configuration, setConfiguration] = useState(Configuration.SHARED_REFERENCE);
   const [maxStroke, setMaxStroke] = useState(0.15); // m.
   const [minSeparation, setMinSeparation] = useState(0.5); // m.
-  const [solution, setSolution] = useState(1);
+  const [solution, setSolution] = useState(0);
   return (
     <BrowserRouter>
       <Container fluid className="user-select-none">
