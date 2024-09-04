@@ -18,6 +18,7 @@ export default function App() {
   const [configuration, setConfiguration] = useState(Configuration.SHARED_REFERENCE);
   const [maxStroke, setMaxStroke] = useState(0.15); // m.
   const [minSeparation, setMinSeparation] = useState(0.5); // m.
+  const [solution, setSolution] = useState(1);
   return (
     <BrowserRouter>
       <Container fluid className="user-select-none">
@@ -30,6 +31,7 @@ export default function App() {
               configuration={configuration} setConfiguration={setConfiguration}
               maxStroke={maxStroke} setMaxStroke={setMaxStroke}
               minSeparation={minSeparation} setMinSeparation={setMinSeparation}
+              solution={solution} setSolution={setSolution}
               />
           </Col>
           <Col className="p-3">
@@ -45,6 +47,7 @@ export default function App() {
               <p>Configuration = {configuration}</p>
               <p>Max mechanical stroke = {maxStroke} m</p>
               <p>Mechanical separation between axes = {minSeparation} m</p>
+              <p>Solution = {solution}</p>
             </div>
             <Footer />
           </Col>
