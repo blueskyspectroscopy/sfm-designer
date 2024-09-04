@@ -46,7 +46,9 @@ export default function Sidebar({
   }) {
 
   // The solution set to draw from.
-  const [numberOfReflections, setNumberOfReflections] = useState(3);
+  const [numberOfReflections, setNumberOfReflections] = useState(computeNumberOfReflections({
+    configuration, numberOfMeasurements
+  }));
 
   // The minimum separation is automatically updated when the nuA input is
   // changed. Some extra logic is required for that.
