@@ -50,3 +50,11 @@ Entry.propTypes = {
   value: PropTypes.object,
   onChange: PropTypes.func,
 };
+
+Entry.defaultProps = {
+  suffix: null,
+  automaticValue: null,
+  onOverrideChange: null,
+  value: null,
+  onChange: null,
+};

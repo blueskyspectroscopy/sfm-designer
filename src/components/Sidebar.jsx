@@ -29,6 +29,7 @@ export default function Sidebar({
     configuration, setConfiguration,
     maxStroke, setMaxStroke,
     minSeparation, setMinSeparation,
+    solution, setSolution,
   }) {
 
   // The minimum separation is automatically updated when the nuA input is
@@ -48,6 +49,7 @@ export default function Sidebar({
     }
   };
 
+  // TODO: move round_to calls into here.
   // Functions to update the exported state.
   const handleNuA = (e) => { setNuA(e.target.value * GHZ_TO_HZ), handleAutomaticMinSeparation() };
   const handleFM = (e) => setFM(e.target.value * KHZ_TO_HZ);
@@ -61,6 +63,7 @@ export default function Sidebar({
       setMinSeparation(e.target.value);
     }
   }
+  const handleSolution = (e) => setSolution(e.target.value);
 
   return (
     <>
@@ -90,31 +93,51 @@ export default function Sidebar({
       <Dropdown
         prefix="Number of measurements"
         value={numberOfMeasurements} onChange={handleNumberOfMeasuremnts}
+        options={[
+          { value: 1, name: '1' },
+          { value: 2, name: '2' },
+          { value: 3, name: '3' },
+          { value: 4, name: '4' },
+          { value: 5, name: '5' },
+        ]}
         aria-label="Number of desired simultaneous measurements"
-        >
-        <option value={1}>1</option>
-        <option value={2}>2</option>
-        <option value={3}>3</option>
-      </Dropdown>
+        />
       <Dropdown
         prefix="Configuration"
         value={configuration} onChange={handleConfiguration}
+        options={[
+          { value: Configuration.SHARED_REFERENCE, name: 'Shared reference' },
+          { value: Configuration.UNIQUE_REFERENCES, name: 'Unique references' },
+        ]}
         aria-label="The interferometer configuration style"
-        >
-        <option value={Configuration.SHARED_REFERENCE}>Shared reference</option>
-        <option value={Configuration.UNIQUE_REFERENCES}>Unique references</option>
-      </Dropdown>
+        />
       <Entry
         type="number" min={0} max={10} step={0.01}
         prefix={<>&Delta;x<sub>max</sub></>} suffix="m"
         value={maxStroke} onChange={handleMaxStroke}
-        aria-label="Maximum mechanical stroke to be measured" />
+        aria-label="Maximum mechanical stroke to be measured"
+        />
       <Entry
         type="number" min={0} max={10} step={0.01}
         prefix={<>&Delta;x<sub>sep</sub></>} suffix="m"
         value={minSeparation} onChange={handleMinSeparation}
         automaticValue={automaticMinSeparation} onOverrideChange={setAutomaticMinSeparationOverride}
-        aria-label="Minimum mechanical separation between axes" />
+        aria-label="Minimum mechanical separation between axes"
+        />
+      <Dropdown
+        prefix="Solution"
+        value={solution} onChange={handleSolution}
+        onCycle={setSolution}
+        options={[
+          /* TODO: Populate with correct options */
+          { value: 1, name: '1' },
+          { value: 2, name: '2' },
+          { value: 3, name: '3' },
+          { value: 4, name: '4' },
+          { value: 5, name: '5' },
+        ]}
+        aria-label="Solution for a number of measurements and configuration"
+        />
     </>
   );
 }
@@ -132,4 +155,6 @@ Sidebar.propTypes = {
   setMaxStroke: PropTypes.func.isRequired,
   minSeparation: PropTypes.number.isRequired,
   setMinSeparation: PropTypes.func.isRequired,
+  solution: PropTypes.object.isRequired,
+  setSolution: PropTypes.func.isRequired,
 };
