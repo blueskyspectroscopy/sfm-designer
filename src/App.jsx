@@ -36,19 +36,17 @@ export default function App() {
           </Col>
           <Col className="p-3">
             <Routes>
-              <Route path="/" element={<Main />} />
+              <Route path="/" element={<Main
+                nuA={nuA}
+                fM={fM}
+                numberOfMeasurements={numberOfMeasurements}
+                configuration={configuration}
+                maxStroke={maxStroke}
+                minSeparation={minSeparation}
+                solution={solution}
+              />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-            {/* TODO Remove this div. */}
-            <div className="d-none">
-              <p>&nu;<sub>A</sub> = {nuA} Hz</p>
-              <p>f<sub>m</sub> = {fM} Hz</p>
-              <p>Number of measurements = {numberOfMeasurements}</p>
-              <p>Configuration = {configuration}</p>
-              <p>Max mechanical stroke = {maxStroke} m</p>
-              <p>Mechanical separation between axes = {minSeparation} m</p>
-              <p>Solution = {solution}</p>
-            </div>
             <Footer />
           </Col>
         </Row>
