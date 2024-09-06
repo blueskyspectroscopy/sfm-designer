@@ -351,7 +351,7 @@ export default function Main({
           <h1>Summary</h1>
           <ul>
             <li>This SFM interferometer uses a <strong>{configuration.toLowerCase().replace('_', ' ')}</strong> configuration.</li>
-            <li><strong>Measurements of {numberOfMeasurements} unique targets</strong> are supported (out of a total <strong>{axisNames.legth} interference axes</strong>).</li>
+            <li><strong>Measurements of {numberOfMeasurements} unique targets</strong> are supported (out of a total <strong>{axisNames.length} interference axes</strong>).</li>
             <li>The normalized length <strong>{SOLUTIONS[numberOfReflections][solution].name}</strong> solution is used.</li>
           </ul>
           {/* TODO: Remove this */}
