@@ -6,7 +6,7 @@ import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import { FaArrowDown, FaArrowUp } from "react-icons/fa";
 
-export default function Dropdown({ prefix, suffix, value, onCycle, options, ...props }) {
+export default function Dropdown({ prefix, suffix = null, value, onCycle = null, options, ...props }) {
   // Handle the clicks of the cycle buttons.
   const [UP, DOWN] = ['UP', 'DOWN'];
   const handleClick = (direction) => {
@@ -63,9 +63,4 @@ Dropdown.propTypes = {
   value: PropTypes.node.isRequired,
   onCycle: PropTypes.func,
   options: PropTypes.array.isRequired,
-};
-
-Dropdown.defaultProps = {
-  suffix: null,
-  onCycle: null,
 };
