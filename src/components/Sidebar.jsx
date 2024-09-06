@@ -30,7 +30,7 @@ const computeNumberOfReflections = ({ configuration, numberOfMeasurements }) => 
     case Configuration.UNIQUE_REFERENCES:
       return 2 * numberOfMeasurements;
     default:
-      console.log(`Invalid configuration: ${configuration}. Defaulting to 2 reflections.`);
+      console.error(`Invalid configuration: ${configuration}. Defaulting to 2 reflections.`);
       return 2;
   }
 }

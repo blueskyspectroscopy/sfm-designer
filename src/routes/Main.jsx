@@ -5,9 +5,18 @@ import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 
-// The classic zip function for two arrays.
-const zip = (a, b) => a.map((x, i) => [x, b[i]]);
+import Configuration from '../model/Configuration';
 
+// The classic zip functions for an arbitrary number of arrays.
+function zip(...args) {
+  const range = [...Array(Math.min(...args.map((x) => x.length))).keys()];
+  return range.map((i) => args.map((a) => a[i]));
+}
+
+// The single character labels that can be used for each reflection.
+const reflectionLabels = 'αβγδεζηθικλμνξοπρστυφχψω';
+
+// TODO: Remove 1x1 coupler when only 1 axis is used.
 export default function Main({
   nuA, fM, numberOfMeasurements, configuration, maxStroke, minSeparation, solution,
 }) {
@@ -19,7 +28,7 @@ export default function Main({
   const padding = 50;
 
   // Lengths in the X direction.
-  const leadFibreW = 100;
+  const leadFibreW = 150;
   const couplerW = 80;
   const connectingFibreW = 100 * (numberOfMeasurements + 1);
   const collimatorW = 80;
@@ -64,41 +73,144 @@ export default function Main({
   });
   const reflectorYs = collimatorYs;
 
+  // Compute where to put the inline reflectors that form the references.
+  const inlineReflectorXYs = (() => {
+    switch (configuration) {
+      case Configuration.SHARED_REFERENCE:
+        return [[padding + 0.5 * (couplerX - 0.5 * couplerW - padding), couplerY]];
+      case Configuration.UNIQUE_REFERENCES:
+        return collimatorYs.map((collimatorY) => [collimatorX - 0.5 * collimatorW, collimatorY]);
+      default:
+        console.error(`Invalid configuration: ${configuration}. Not drawing inline reflectors.`);
+        return [];
+    }
+  })();
+
+  // Compute where to put the reflection labels.
+  const reflectionLabelXYs = (() => {
+    let unsorted = inlineReflectorXYs.concat(zip(reflectorXs, reflectorYs));
+    switch (configuration) {
+      case Configuration.SHARED_REFERENCE:
+        return unsorted.sort(([x1, y1], [x2, y2]) => x1 - x2 != 0 ? x1 - x2 : y1 - y2);
+      case Configuration.UNIQUE_REFERENCES:
+        return unsorted.sort(([x1, y1], [x2, y2]) => y1 - y2 != 0 ? y1 - y2 : x1 - x2);
+      default:
+        console.error(`Invalid configuration: ${configuration}. Not drawing reflection labels.`);
+        return [];
+    }
+  })();
+
   // Auxiliary lengths.
+  const textShift = 5; // Pad text from other objects.
   const collimatorL = 0.6 * collimatorW; // Length of collimator body.
   const reflectorJ = -0.2 * reflectorH; // Where the line through the reflector connects on the left.
+  const fibreBezierControlX = 50 * numberOfMeasurements; // Horizontal control point distance for fibre curves.
+  const inlineReflectorR = 20; // Radius of inline reflections.
+  const reflectionLabelYShift = -Math.max(inlineReflectorR, collimatorH); // Vertical shift for reflection labels to pull them off the optical axis basline.
+  const motionArrowStep = 5; // Half width of the motion arrows.
+  const fontSize = 16 + 3 * numberOfMeasurements; // Scales with measurements since the image increases in size.
 
-  const outlineStyle = { fill: 'none', stroke: '#000000', strokeLinecap: 'round', strokeLinejoin: 'round', strokeOpacity: 1, strokeWidth: '2px' }
+  // SVG styles.
+  const componentStyle = {
+    fill: '#ffffff',
+    fillOpacity: 1,
+    stroke: '#000000',
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    strokeOpacity: 1,
+    strokeWidth: '2px'
+  };
+  const inlineReflectorStyle = {
+    ...componentStyle,
+    fill: 'none',
+    stroke: '#777777',
+    strokeWidth: '4px',
+  };
+  const fibreStyle = {
+    fill: 'none',
+    stroke: '#0000ff',
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    strokeOpacity: 1,
+    strokeWidth: '4px'
+  }
+  const beamStyle = {
+    ...fibreStyle,
+    strokeDasharray: '6 12',
+  }
+  const motionStyle = {
+    fill: '#ff0000',
+    stroke: '#ff0000',
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    strokeOpacity: 1,
+    strokeWidth: '2px'
+  }
+
   return (
     <Container>
       <Row>
         <Col>
           <div className="border">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 ${viewW} ${viewH}`}>
-              {/* TODO: Draw lead fibre */}
-              {/* Coupler */}
-              <path
-                style={outlineStyle}
+              {/* Lead fibre */}
+              <path style={fibreStyle}
                 d={`
-                  M${couplerX} ${couplerY}
-                  m${-couplerW/2} ${couplerH/2}
-                  l${0} ${-couplerH}
-                  l${couplerW} ${0}
-                  l${0} ${couplerH}
-                  l${-couplerW} ${0}
-                  z
+                  M${padding} ${couplerY}
+                  L${couplerX - 0.5 * couplerW} ${couplerY}
                   `}
-                />
+              />
+              {/* Fibres from coupler to collimators */}
+              {collimatorYs.map((collimatorY, index) => {
+                return (
+                  <path key={index} style={fibreStyle}
+                    d={`
+                      M${couplerX + 0.5 * couplerW} ${couplerY}
+                      C
+                        ${couplerX + 0.5 * couplerW + fibreBezierControlX} ${couplerY}
+                        ${collimatorX - 0.5 * collimatorW - fibreBezierControlX} ${collimatorY}
+                        ${collimatorX - 0.5 * collimatorW} ${collimatorY}
+                      `}
+                  />
+                );
+              })}
+              {/* Free-space beams */}
+              {zip(collimatorYs, reflectorXs, reflectorYs).map(([collimatorY, reflectorX, reflectorY], index) => {
+                return (
+                  <path key={index} style={beamStyle}
+                    d={`
+                      M${collimatorX + 0.5 * collimatorW} ${collimatorY}
+                      L${reflectorX - 0.5 * reflectorW} ${reflectorY}
+                      `}
+                  />
+                );
+              })}
+              {/* Coupler */}
+              <>
+                <path style={componentStyle}
+                  d={`
+                    M${couplerX - 0.5 * couplerW} ${couplerY + 0.5 * couplerH}
+                    l${0} ${-couplerH}
+                    l${couplerW} ${0}
+                    l${0} ${couplerH}
+                    l${-couplerW} ${0}
+                    z
+                    `}
+                  />
+                <text
+                  x={couplerX} y={couplerY - 0.5 * couplerH - textShift}
+                  fontSize={fontSize} textAnchor="middle"
+                  >
+                  1&times;{numberOfMeasurements}
+                </text>
+              </>
               {/* Collimators */}
               {collimatorYs.map((collimatorY, index) => {
                 return (
-                  <path
-                    key={index}
-                    style={outlineStyle}
+                  <path key={index} style={componentStyle}
                     d={`
-                      M${collimatorX} ${collimatorY}
-                      m${-collimatorW/2} ${0}
-                      l${collimatorW-collimatorL} ${-collimatorH/2}
+                      M${collimatorX - 0.5 * collimatorW} ${collimatorY}
+                      l${collimatorW - collimatorL} ${-0.5 * collimatorH}
                       l${collimatorL} ${0}
                       l${0} ${collimatorH}
                       l${-collimatorL} ${0}
@@ -107,16 +219,13 @@ export default function Main({
                   />
                 );
               })}
-              {/* TODO: Draw retroreflectors */}
+              {/* Retroreflectors */}
               {zip(reflectorXs, reflectorYs).map(([reflectorX, reflectorY], index) => {
                 return (
-                  <path
-                    key={index}
-                    style={outlineStyle}
+                  <path key={index} style={componentStyle}
                     d={`
-                      M${reflectorX} ${reflectorY}
-                      m${reflectorW/2} ${0}
-                      l${-reflectorW} ${-reflectorH/2}
+                      M${reflectorX + 0.5 * reflectorW} ${reflectorY}
+                      l${-reflectorW} ${-0.5 * reflectorH}
                       l${0} ${reflectorH}
                       z
                       l${-reflectorW} ${reflectorJ}
@@ -124,28 +233,76 @@ export default function Main({
                     />
                 );
               })}
-              {/*
-              <path
-                style={outlineStyle}
-                d={`
-                  M${800} ${250}
-                  m${reflectorW/2} ${0}
-                  l${-reflectorW} ${-reflectorH/2}
-                  l${0} ${reflectorH}
-                  z
-                  l${-reflectorW} ${reflectorJ}
-                  `}
-                />
-              */}
-              {/* TODO: Draw fibres */}
-              {/* TODO: Draw axis labels */}
+              {/* Inline reflectors. */}
+              {inlineReflectorXYs.map(([inlineReflectorX, inlineReflectorY], index) => {
+                return (
+                  <path key={index} style={inlineReflectorStyle}
+                    d={`
+                      M${inlineReflectorX} ${inlineReflectorY + inlineReflectorR}
+                      l${0} ${-2 * inlineReflectorR}
+                      `}
+                    />
+                );
+              })}
+              {/* Reflection labels */}
+              {reflectionLabelXYs.map(([reflectionLabelX, reflectionLabelY], index) => {
+                return (
+                  <text
+                    key={index}
+                    x={reflectionLabelX} y={reflectionLabelY + reflectionLabelYShift - textShift}
+                    fontSize={fontSize} textAnchor="middle"
+                    >
+                    {reflectionLabels[index]}
+                  </text>
+                );
+              })}
+              {/* Motion lines. */}
+              {zip(reflectorXs, reflectorYs).map(([reflectorX, reflectorY], index) => {
+                return (
+                  <React.Fragment key={index}>
+                    <path style={motionStyle}
+                      d={`
+                        M${reflectorX - 0.5 * motionW} ${reflectorY + 0.5 * reflectorH + textShift}
+                        l${motionW} ${0}
+                        M${reflectorX - 0.5 * motionW} ${reflectorY + 0.5 * reflectorH + textShift}
+                        l${2 * motionArrowStep} ${-motionArrowStep}
+                        l${0} ${2 * motionArrowStep}
+                        z
+                        l${0} ${motionArrowStep}
+                        l${0} ${-2 * motionArrowStep}
+                        M${reflectorX + 0.5 * motionW} ${reflectorY + 0.5 * reflectorH + textShift}
+                        l${-2 * motionArrowStep} ${-motionArrowStep}
+                        l${0} ${2 * motionArrowStep}
+                        z
+                        l${0} ${motionArrowStep}
+                        l${0} ${-2 * motionArrowStep}
+                        `}
+                      />
+                    <text
+                      x={reflectorX} y={reflectorY + 0.5 * reflectorH + 2 * textShift}
+                      fontSize={fontSize} textAnchor="middle" dominantBaseline="hanging"
+                      >
+                      {(() => {
+                        let axisName = '';
+                        switch (configuration) {
+                          case Configuration.SHARED_REFERENCE:
+                            axisName = reflectionLabels[0] + reflectionLabels[index + 1];
+                            break;
+                          case Configuration.UNIQUE_REFERENCES:
+                            axisName = reflectionLabels[2 * index] + reflectionLabels[2 * index + 1];
+                            break;
+                          default:
+                            console.error(`Invalid configuration: ${configuration}. Not drawing motion labels.`);
+                            return <></>;
+                        }
+                        return <>&Delta;x<tspan fontSize={0.8 * fontSize} dy={0.3 * fontSize}>{axisName}</tspan></>;
+                      })()}
+                    </text>
+                    </React.Fragment>
+                );
+              })}
               {/* TODO: Draw delay lengths */}
-              {/* TODO: Draw motion */}
               {/* TODO: Draw either normalized or actual lengths */}
-              {/*
-              <circle style={{ fillOpacity: 1, fill:'#c757e7', stroke: 'none' }} r="50" cx="50" cy="50"/>
-              <path style={{ fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round', strokeOpacity: 1, strokeWidth: '8px', stroke: '#ffffff' }} d="M15 50c7-35 28-35 35 0s28 35 35 0"/>
-              */}
             </svg>
           </div>
         </Col>
