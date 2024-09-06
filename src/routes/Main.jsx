@@ -1,11 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
+import Table from 'react-bootstrap/Table';
+
+import { TfiDownload } from 'react-icons/tfi';
 
 import Configuration from '../model/Configuration';
+import SOLUTIONS from '../model/Solutions';
 
 // The classic zip functions for an arbitrary number of arrays.
 function zip(...args) {
@@ -18,11 +23,35 @@ const reflectionLabels = 'αβγδεζηθικλμνξοπρστυφχψω';
 
 // TODO: Remove 1x1 coupler when only 1 axis is used.
 export default function Main({
-  nuA, fM, numberOfMeasurements, configuration, maxStroke, minSeparation, solution,
+  nuA, fM, numberOfMeasurements, numberOfReflections, configuration, maxStroke, minSeparation, solution,
 }) {
   // This is an iterator over the number of measurements. It is used to compute
   // drawing values for each measurement.
   const measurements = [...Array(numberOfMeasurements).keys()];
+
+  // The names of all axes.
+  const axisNames = (() => {
+    let names = [];
+    for (let i = 0; i < numberOfReflections; i++) {
+      for (let j = i + 1; j < numberOfReflections; j++) {
+        names.push(reflectionLabels[i] + reflectionLabels[j]);
+      }
+    }
+    return names;
+  })();
+
+  // The names of the measurement axes.
+  let measurementNames = measurements.map(() => '');
+  switch (configuration) {
+    case Configuration.SHARED_REFERENCE:
+      measurementNames = measurements.map((index) => reflectionLabels[0] + reflectionLabels[index + 1]);
+      break;
+    case Configuration.UNIQUE_REFERENCES:
+      measurementNames = measurements.map((index) => reflectionLabels[2 * index] + reflectionLabels[2 * index + 1]);
+      break;
+    default:
+      console.error(`Invalid configuration: ${configuration}. Not drawing motion labels.`);
+  }
 
   // Generic lengths.
   const padding = 50;
@@ -150,8 +179,9 @@ export default function Main({
   return (
     <Container>
       <Row>
-        <Col>
-          <div className="border">
+        <Col className="pb-3">
+          <h1>Schematic</h1>
+          <div id="main-design" className="border">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 ${viewW} ${viewH}`}>
               {/* Lead fibre */}
               <path style={fibreStyle}
@@ -282,21 +312,8 @@ export default function Main({
                       x={reflectorX} y={reflectorY + 0.5 * reflectorH + 2 * textShift}
                       fontSize={fontSize} textAnchor="middle" dominantBaseline="hanging"
                       >
-                      {(() => {
-                        let axisName = '';
-                        switch (configuration) {
-                          case Configuration.SHARED_REFERENCE:
-                            axisName = reflectionLabels[0] + reflectionLabels[index + 1];
-                            break;
-                          case Configuration.UNIQUE_REFERENCES:
-                            axisName = reflectionLabels[2 * index] + reflectionLabels[2 * index + 1];
-                            break;
-                          default:
-                            console.error(`Invalid configuration: ${configuration}. Not drawing motion labels.`);
-                            return <></>;
-                        }
-                        return <>&Delta;x<tspan fontSize={0.8 * fontSize} dy={0.3 * fontSize}>{axisName}</tspan></>;
-                      })()}
+                        &Delta;x
+                        <tspan fontSize={0.8 * fontSize} dy={0.3 * fontSize}>{measurementNames[index]}</tspan>
                     </text>
                     </React.Fragment>
                 );
@@ -305,20 +322,75 @@ export default function Main({
               {/* TODO: Draw either normalized or actual lengths */}
             </svg>
           </div>
+          <Button
+            className="mt-3 d-print-none user-select-none"
+            variant="outline-primary"
+            onClick={() => {
+              // Pull the SVG from the DOM and crudely minify it by removing spaces.
+              const text = document.getElementById('main-design').innerHTML
+                .replaceAll(/\s+/gi, ' ')
+                .replaceAll(/\s*?"\s*?/gi, '"')
+                .replaceAll(/\s*?<\s*?/gi, '<')
+                .replaceAll(/\s*?>\s*?/gi, '>');
+              // Create a temporary element that is used to download the SVG as a file.
+              var element = document.createElement('a');
+              element.style.display = 'none';
+              element.setAttribute('href', 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(text));
+              element.setAttribute('download', 'interferometer.svg');
+              document.body.appendChild(element);
+              element.click();
+              document.body.removeChild(element);
+            }}
+            >
+              <TfiDownload /> Download SVG
+          </Button>
         </Col>
       </Row>
-      <Row>
+      <Row className="py-3">
         <Col>
+          <h1>Summary</h1>
+          <ul>
+            <li>This SFM interferometer uses a <strong>{configuration.toLowerCase().replace('_', ' ')}</strong> configuration.</li>
+            <li><strong>Measurements of {numberOfMeasurements} unique targets</strong> are supported (out of a total <strong>{axisNames.legth} interference axes</strong>).</li>
+            <li>The normalized length <strong>{SOLUTIONS[numberOfReflections][solution].name}</strong> solution is used.</li>
+          </ul>
           {/* TODO: Remove this */}
-          <div className="pt-5 text-muted d-none">
+          <div className="d-none">
             <p>&nu;<sub>A</sub> = {nuA} Hz</p>
             <p>f<sub>m</sub> = {fM} Hz</p>
-            <p>Number of measurements = {numberOfMeasurements}</p>
-            <p>Configuration = {configuration}</p>
             <p>Max mechanical stroke = {maxStroke} m</p>
             <p>Mechanical separation between axes = {minSeparation} m</p>
-            <p>Solution = {solution}</p>
           </div>
+        </Col>
+      </Row>
+      <Row className="pt-3">
+        <Col>
+          <h1>Interferometer Characteristics</h1>
+          <Table bordered hover>
+            <thead>
+              <tr>
+                <th>Axis</th>
+                <th>Normalized Length</th>
+                <th>Actual Length</th>
+                <th>Beat Frequency Bandwidth</th>
+              </tr>
+            </thead>
+            <tbody>
+              {/* TODO Highlight the chosen axes somehow */}
+              {axisNames.map((axisName, index) => {
+                return (
+                  <tr key={index} className={measurementNames.includes(axisName) ? 'bg-secondary-subtle' : ''}>
+                    {/* The transparent background is necessary to show the tr background color. */}
+                    <td className="bg-transparent">{axisName}</td>
+                    <td className="bg-transparent"><span className="text-muted">Coming soon</span></td>
+                    <td className="bg-transparent"><span className="text-muted">Coming soon</span></td>
+                    <td className="bg-transparent"><span className="text-muted">Coming soon</span></td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+          {/* TODO: Remove this */}
         </Col>
       </Row>
     </Container>
@@ -329,8 +401,9 @@ Main.propTypes = {
   nuA: PropTypes.number.isRequired,
   fM: PropTypes.number.isRequired,
   numberOfMeasurements: PropTypes.number.isRequired,
-  configuration: PropTypes.number.isRequired,
+  numberOfReflections: PropTypes.number.isRequired,
+  configuration: PropTypes.string.isRequired,
   maxStroke: PropTypes.number.isRequired,
   minSeparation: PropTypes.number.isRequired,
-  solution: PropTypes.object.isRequired,
+  solution: PropTypes.number.isRequired,
 };
