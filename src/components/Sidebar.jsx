@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
-import Configuration from '../model/Configuration';
+import Configuration, { computeNumberOfReflections } from '../model/Configuration';
 import Dropdown from './Dropdown';
 import Entry from './Entry';
 import Logo from '../assets/logo.svg?react';
@@ -23,32 +23,16 @@ const roundTo = (x, n) => {
   return Math.round(d * x) / d;
 }
 
-const computeNumberOfReflections = ({ configuration, numberOfMeasurements }) => {
-  switch (configuration) {
-    case Configuration.SHARED_REFERENCE:
-      return numberOfMeasurements + 1;
-    case Configuration.UNIQUE_REFERENCES:
-      return 2 * numberOfMeasurements;
-    default:
-      console.error(`Invalid configuration: ${configuration}. Defaulting to 2 reflections.`);
-      return 2;
-  }
-}
-
 export default function Sidebar({
     nuA, setNuA,
     fM, setFM,
     numberOfMeasurements, setNumberOfMeasurements,
+    numberOfReflections, setNumberOfReflections,
     configuration, setConfiguration,
     maxStroke, setMaxStroke,
     minSeparation, setMinSeparation,
     solution, setSolution,
   }) {
-
-  // The solution set to draw from.
-  const [numberOfReflections, setNumberOfReflections] = useState(computeNumberOfReflections({
-    configuration, numberOfMeasurements
-  }));
 
   // The minimum separation is automatically updated when the nuA input is
   // changed. Some extra logic is required for that.
@@ -173,12 +157,14 @@ Sidebar.propTypes = {
   setFM: PropTypes.func.isRequired,
   numberOfMeasurements: PropTypes.number.isRequired,
   setNumberOfMeasurements: PropTypes.func.isRequired,
-  configuration: PropTypes.number.isRequired,
+  numberOfReflections: PropTypes.number.isRequired,
+  setNumberOfReflections: PropTypes.func.isRequired,
+  configuration: PropTypes.string.isRequired,
   setConfiguration: PropTypes.func.isRequired,
   maxStroke: PropTypes.number.isRequired,
   setMaxStroke: PropTypes.func.isRequired,
   minSeparation: PropTypes.number.isRequired,
   setMinSeparation: PropTypes.func.isRequired,
-  solution: PropTypes.object.isRequired,
+  solution: PropTypes.number.isRequired,
   setSolution: PropTypes.func.isRequired,
 };

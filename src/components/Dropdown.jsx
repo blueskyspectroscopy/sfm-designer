@@ -60,7 +60,7 @@ export default function Dropdown({ prefix, suffix, value, onCycle, options, ...p
 Dropdown.propTypes = {
   prefix: PropTypes.node.isRequired,
   suffix: PropTypes.node,
-  value: PropTypes.object.isRequired,
+  value: PropTypes.node.isRequired,
   onCycle: PropTypes.func,
   options: PropTypes.array.isRequired,
 };

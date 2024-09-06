@@ -5,7 +5,7 @@ import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 
-import Configuration from './model/Configuration';
+import Configuration, { computeNumberOfReflections } from './model/Configuration';
 import Footer from './components/Footer';
 import Main from './routes/Main';
 import NotFound from './routes/NotFound';
@@ -19,15 +19,19 @@ export default function App() {
   const [maxStroke, setMaxStroke] = useState(0.15); // m.
   const [minSeparation, setMinSeparation] = useState(0.5); // m.
   const [solution, setSolution] = useState(0);
+  const [numberOfReflections, setNumberOfReflections] = useState(computeNumberOfReflections({
+    configuration, numberOfMeasurements
+  }));
   return (
     <BrowserRouter>
-      <Container fluid className="user-select-none">
+      <Container fluid>
         <Row className="min-vh-100">
-          <Col md={6} lg={5} xl={4} className="p-3 bg-light border-end">
+          <Col md={6} lg={5} xl={4} className="p-3 bg-light border-end d-print-none user-select-none">
             <Sidebar
               nuA={nuA} setNuA={setNuA}
               fM={fM} setFM={setFM}
               numberOfMeasurements={numberOfMeasurements} setNumberOfMeasurements={setNumberOfMeasurements}
+              numberOfReflections={numberOfReflections} setNumberOfReflections={setNumberOfReflections}
               configuration={configuration} setConfiguration={setConfiguration}
               maxStroke={maxStroke} setMaxStroke={setMaxStroke}
               minSeparation={minSeparation} setMinSeparation={setMinSeparation}
@@ -40,6 +44,7 @@ export default function App() {
                 nuA={nuA}
                 fM={fM}
                 numberOfMeasurements={numberOfMeasurements}
+                numberOfReflections={numberOfReflections}
                 configuration={configuration}
                 maxStroke={maxStroke}
                 minSeparation={minSeparation}

@@ -45,9 +45,9 @@ export default function Entry({
 Entry.propTypes = {
   prefix: PropTypes.node.isRequired,
   suffix: PropTypes.node,
-  automaticValue: PropTypes.object,
+  automaticValue: PropTypes.node,
   onOverrideChange: PropTypes.func,
-  value: PropTypes.object,
+  value: PropTypes.node,
   onChange: PropTypes.func,
 };
 
