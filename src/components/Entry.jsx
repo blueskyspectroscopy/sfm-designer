@@ -6,8 +6,8 @@ import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 
 export default function Entry({
-    prefix, suffix, automaticValue, onOverrideChange,
-    value, onChange, ...props
+    prefix, suffix = null, automaticValue = null, onOverrideChange = null,
+    value = null, onChange = null, ...props
   }) {
   const [override, setOverride] = useState(false);
   const handleOverride = () => {
@@ -49,12 +49,4 @@ Entry.propTypes = {
   onOverrideChange: PropTypes.func,
   value: PropTypes.node,
   onChange: PropTypes.func,
-};
-
-Entry.defaultProps = {
-  suffix: null,
-  automaticValue: null,
-  onOverrideChange: null,
-  value: null,
-  onChange: null,
 };
