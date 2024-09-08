@@ -35,7 +35,7 @@ export default function Footer() {
         </div>
         <div className="flex-grow-0">
           <small>
-            Copyright
+            Copyright ©
             {' '}
             {new Date().getFullYear()}
             {' '}
