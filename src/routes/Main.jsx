@@ -26,23 +26,23 @@ export default function Main() {
   const {
     nuA,
     fM,
-    numberOfMeasurements,
+    numMeasurements,
     configuration,
     maxStroke,
     minSeparation,
     solution,
-    numberOfReflections,
+    numReflections,
   } = useContext(DataContext);
 
   // This is an iterator over the number of measurements. It is used to compute
   // drawing values for each measurement.
-  const measurements = [...Array(numberOfMeasurements).keys()];
+  const measurements = [...Array(numMeasurements).keys()];
 
   // The names of all axes.
   const axisNames = (() => {
     let names = [];
-    for (let i = 0; i < numberOfReflections; i++) {
-      for (let j = i + 1; j < numberOfReflections; j++) {
+    for (let i = 0; i < numReflections; i++) {
+      for (let j = i + 1; j < numReflections; j++) {
         names.push(reflectionLabels[i] + reflectionLabels[j]);
       }
     }
@@ -68,7 +68,7 @@ export default function Main() {
   // Lengths in the X direction.
   const leadFibreW = 150;
   const couplerW = 80;
-  const connectingFibreW = 100 * (numberOfMeasurements + 1);
+  const connectingFibreW = 100 * (numMeasurements + 1);
   const collimatorW = 80;
   const standoffUnitW = 200;
   const reflectorW = 50;
@@ -84,7 +84,7 @@ export default function Main() {
     + 2 * padding // Padding on left and right.
     + leadFibreW
     + connectingFibreW
-    + standoffUnitW * numberOfMeasurements
+    + standoffUnitW * numMeasurements
     // The right half of the reflector or motion line is used (whichever is larger).
     + 0.5 * Math.max(reflectorW, motionW)
   );
@@ -94,7 +94,7 @@ export default function Main() {
     // heights.
     + Math.max(couplerH, collimatorH, reflectorH)
     // The rest is made up by the number of gaps.
-    + (numberOfMeasurements - 1) * collimatorReflectorYGap
+    + (numMeasurements - 1) * collimatorReflectorYGap
   );
 
   // X positions to the centre of each element.
@@ -105,7 +105,7 @@ export default function Main() {
   // Y positions to the centre of each element.
   const couplerY = 0.5 * viewH;
   const collimatorYs = measurements.map((m) => {
-    const gaps = numberOfMeasurements - 1;
+    const gaps = numMeasurements - 1;
     const span = gaps * collimatorReflectorYGap;
     return 0.5 * viewH + (gaps == 0 ? 0 : (m / gaps - 0.5) * span);
   });
@@ -142,11 +142,11 @@ export default function Main() {
   const textShift = 5; // Pad text from other objects.
   const collimatorL = 0.6 * collimatorW; // Length of collimator body.
   const reflectorJ = -0.2 * reflectorH; // Where the line through the reflector connects on the left.
-  const fibreBezierControlX = 50 * numberOfMeasurements; // Horizontal control point distance for fibre curves.
+  const fibreBezierControlX = 50 * numMeasurements; // Horizontal control point distance for fibre curves.
   const inlineReflectorR = 20; // Radius of inline reflections.
   const reflectionLabelYShift = -Math.max(inlineReflectorR, collimatorH); // Vertical shift for reflection labels to pull them off the optical axis basline.
   const motionArrowStep = 5; // Half width of the motion arrows.
-  const fontSize = 16 + 3 * numberOfMeasurements; // Scales with measurements since the image increases in size.
+  const fontSize = 16 + 3 * numMeasurements; // Scales with measurements since the image increases in size.
 
   // SVG styles.
   const componentStyle = {
@@ -240,7 +240,7 @@ export default function Main() {
                   x={couplerX} y={couplerY - 0.5 * couplerH - textShift}
                   fontSize={fontSize} textAnchor="middle"
                   >
-                  1&times;{numberOfMeasurements}
+                  1&times;{numMeasurements}
                 </text>
               </>
               {/* Collimators */}
@@ -360,8 +360,8 @@ export default function Main() {
           <h1>Summary</h1>
           <ul>
             <li>This SFM interferometer uses a <strong>{configuration.toLowerCase().replace('_', ' ')}</strong> configuration.</li>
-            <li><strong>Measurements of {numberOfMeasurements} unique targets</strong> are supported (out of a total <strong>{axisNames.length} interference axes</strong>).</li>
-            <li>The normalized length <strong>{SOLUTIONS[numberOfReflections][solution].name}</strong> solution is used.</li>
+            <li><strong>Measurements of {numMeasurements} unique targets</strong> are supported (out of a total <strong>{axisNames.length} interference axes</strong>).</li>
+            <li>The normalized length <strong>{SOLUTIONS[numReflections][solution].name}</strong> solution is used.</li>
           </ul>
           {/* TODO: Remove this */}
           <div className="d-none">

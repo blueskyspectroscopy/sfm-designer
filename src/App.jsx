@@ -5,7 +5,7 @@ import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 
-import Configuration, { computeNumberOfReflections } from './model/Configuration';
+import Configuration, { computeNumReflections } from './model/Configuration';
 import Footer from './components/Footer';
 import Main from './routes/Main';
 import NotFound from './routes/NotFound';
@@ -17,23 +17,23 @@ export const DataContext = createContext(null);
 export default function App() {
   const [nuA, setNuA] = useState(1e9); // Hz.
   const [fM, setFM] = useState(1e5); // Hz.
-  const [numberOfMeasurements, setNumberOfMeasurements] = useState(2);
+  const [numMeasurements, setNumMeasurements] = useState(2);
   const [configuration, setConfiguration] = useState(Configuration.SHARED_REFERENCE);
   const [maxStroke, setMaxStroke] = useState(0.15); // m.
   const [minSeparation, setMinSeparation] = useState(0.5); // m.
   const [solution, setSolution] = useState(0);
-  const [numberOfReflections, setNumberOfReflections] = useState(computeNumberOfReflections({
-    configuration, numberOfMeasurements
+  const [numReflections, setNumReflections] = useState(computeNumReflections({
+    configuration, numMeasurements
   }));
   const dataContextValue = {
     nuA, setNuA,
     fM, setFM,
-    numberOfMeasurements, setNumberOfMeasurements,
+    numMeasurements, setNumMeasurements,
     configuration, setConfiguration,
     maxStroke, setMaxStroke,
     minSeparation, setMinSeparation,
     solution, setSolution,
-    numberOfReflections, setNumberOfReflections,
+    numReflections, setNumReflections,
   };
   return (
     <BrowserRouter>
