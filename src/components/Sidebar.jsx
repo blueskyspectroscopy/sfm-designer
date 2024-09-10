@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { DataContext } from '../App';
 import Configuration, { computeNumberOfReflections } from '../model/Configuration';
 import Dropdown from './Dropdown';
 import Entry from './Entry';
@@ -23,16 +23,17 @@ const roundTo = (x, n) => {
   return Math.round(d * x) / d;
 }
 
-export default function Sidebar({
+export default function Sidebar() {
+  const {
     nuA, setNuA,
     fM, setFM,
     numberOfMeasurements, setNumberOfMeasurements,
-    numberOfReflections, setNumberOfReflections,
     configuration, setConfiguration,
     maxStroke, setMaxStroke,
     minSeparation, setMinSeparation,
     solution, setSolution,
-  }) {
+    numberOfReflections, setNumberOfReflections,
+  } = useContext(DataContext);
 
   // The minimum separation is automatically updated when the nuA input is
   // changed. Some extra logic is required for that.
@@ -149,22 +150,3 @@ export default function Sidebar({
     </>
   );
 }
-
-Sidebar.propTypes = {
-  nuA: PropTypes.number.isRequired,
-  setNuA: PropTypes.func.isRequired,
-  fM: PropTypes.number.isRequired,
-  setFM: PropTypes.func.isRequired,
-  numberOfMeasurements: PropTypes.number.isRequired,
-  setNumberOfMeasurements: PropTypes.func.isRequired,
-  numberOfReflections: PropTypes.number.isRequired,
-  setNumberOfReflections: PropTypes.func.isRequired,
-  configuration: PropTypes.string.isRequired,
-  setConfiguration: PropTypes.func.isRequired,
-  maxStroke: PropTypes.number.isRequired,
-  setMaxStroke: PropTypes.func.isRequired,
-  minSeparation: PropTypes.number.isRequired,
-  setMinSeparation: PropTypes.func.isRequired,
-  solution: PropTypes.number.isRequired,
-  setSolution: PropTypes.func.isRequired,
-};

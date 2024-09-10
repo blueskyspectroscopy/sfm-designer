@@ -1,5 +1,4 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useContext } from 'react';
 
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
@@ -9,6 +8,7 @@ import Table from 'react-bootstrap/Table';
 
 import { TfiDownload } from 'react-icons/tfi';
 
+import { DataContext } from '../App';
 import Configuration from '../model/Configuration';
 import SOLUTIONS from '../model/Solutions';
 
@@ -22,9 +22,18 @@ function zip(...args) {
 const reflectionLabels = 'αβγδεζηθικλμνξοπρστυφχψω';
 
 // TODO: Remove 1x1 coupler when only 1 axis is used.
-export default function Main({
-  nuA, fM, numberOfMeasurements, numberOfReflections, configuration, maxStroke, minSeparation, solution,
-}) {
+export default function Main() {
+  const {
+    nuA,
+    fM,
+    numberOfMeasurements,
+    configuration,
+    maxStroke,
+    minSeparation,
+    solution,
+    numberOfReflections,
+  } = useContext(DataContext);
+
   // This is an iterator over the number of measurements. It is used to compute
   // drawing values for each measurement.
   const measurements = [...Array(numberOfMeasurements).keys()];
@@ -396,14 +405,3 @@ export default function Main({
     </Container>
   );
 }
-
-Main.propTypes = {
-  nuA: PropTypes.number.isRequired,
-  fM: PropTypes.number.isRequired,
-  numberOfMeasurements: PropTypes.number.isRequired,
-  numberOfReflections: PropTypes.number.isRequired,
-  configuration: PropTypes.string.isRequired,
-  maxStroke: PropTypes.number.isRequired,
-  minSeparation: PropTypes.number.isRequired,
-  solution: PropTypes.number.isRequired,
-};
