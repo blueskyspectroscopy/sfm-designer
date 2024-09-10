@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { DataContext } from '../App';
-import Configuration, { computeNumberOfReflections } from '../model/Configuration';
+import Configuration, { computeNumReflections } from '../model/Configuration';
 import Dropdown from './Dropdown';
 import Entry from './Entry';
 import Logo from '../assets/logo.svg?react';
@@ -27,12 +27,12 @@ export default function Sidebar() {
   const {
     nuA, setNuA,
     fM, setFM,
-    numberOfMeasurements, setNumberOfMeasurements,
+    numMeasurements, setNumMeasurements,
     configuration, setConfiguration,
     maxStroke, setMaxStroke,
     minSeparation, setMinSeparation,
     solution, setSolution,
-    numberOfReflections, setNumberOfReflections,
+    numReflections, setNumReflections,
   } = useContext(DataContext);
 
   // The minimum separation is automatically updated when the nuA input is
@@ -59,17 +59,17 @@ export default function Sidebar() {
     handleAutomaticMinSeparation();
   };
   const handleFM = (e) => setFM(e.target.value * KHZ_TO_HZ);
-  const handleNumberOfMeasuremnts = (e) => {
-    setNumberOfMeasurements(parseInt(e.target.value));
-    setNumberOfReflections(computeNumberOfReflections({
-      configuration, numberOfMeasurements: parseInt(e.target.value)
+  const handleNumMeasuremnts = (e) => {
+    setNumMeasurements(parseInt(e.target.value));
+    setNumReflections(computeNumReflections({
+      configuration, numMeasurements: parseInt(e.target.value)
     }));
     setSolution(0);
   };
   const handleConfiguration = (e) => {
     setConfiguration(e.target.value);
-    setNumberOfReflections(computeNumberOfReflections({
-      configuration: e.target.value, numberOfMeasurements,
+    setNumReflections(computeNumReflections({
+      configuration: e.target.value, numMeasurements,
     }));
     setSolution(0);
   }
@@ -110,7 +110,7 @@ export default function Sidebar() {
         />
       <Dropdown
         prefix="Number of measurements"
-        value={numberOfMeasurements} onChange={handleNumberOfMeasuremnts}
+        value={numMeasurements} onChange={handleNumMeasuremnts}
         options={[
           { value: 1, name: '1' },
           { value: 2, name: '2' },
@@ -144,7 +144,7 @@ export default function Sidebar() {
         prefix="Solution"
         value={solution} onChange={handleSolution}
         onCycle={setSolution}
-        options={SOLUTIONS[numberOfReflections]}
+        options={SOLUTIONS[numReflections]}
         aria-label="Solution for a number of measurements and configuration"
         />
     </>
