@@ -111,11 +111,10 @@ export default function Sidebar() {
       <Dropdown
         prefix="Number of measurements"
         value={numMeasurements} onChange={handleNumMeasuremnts}
-        options={[
-          { value: 1, name: '1' },
-          { value: 2, name: '2' },
-          { value: 3, name: '3' },
-        ]}
+        options={(()=>{
+          let maxSolutionSize = Math.max.apply(null, Object.keys(SOLUTIONS));
+          return [...Array(maxSolutionSize / 2).keys()].map((key) => ({value: key + 1, name: `${key + 1}`}));
+        })()}
         aria-label="Number of desired simultaneous measurements"
         />
       <Dropdown
