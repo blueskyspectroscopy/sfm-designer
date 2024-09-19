@@ -1,12 +1,13 @@
 import React, { useContext } from 'react';
 
 import Button from 'react-bootstrap/Button';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Table from 'react-bootstrap/Table';
 
-import { TfiDownload } from 'react-icons/tfi';
+import { TfiDownload, TfiPrinter } from 'react-icons/tfi';
 
 import { DataContext } from '../App';
 import Configuration from '../model/Configuration';
@@ -161,12 +162,12 @@ export default function Main() {
   const inlineReflectorStyle = {
     ...componentStyle,
     fill: 'none',
-    stroke: '#777777',
-    strokeWidth: '4px',
+    stroke: '#f9690e',
+    strokeWidth: '6px',
   };
   const fibreStyle = {
     fill: 'none',
-    stroke: '#0000ff',
+    stroke: '#4871f7',
     strokeLinecap: 'round',
     strokeLinejoin: 'round',
     strokeOpacity: 1,
@@ -177,8 +178,8 @@ export default function Main() {
     strokeDasharray: '6 12',
   }
   const motionStyle = {
-    fill: '#ff0000',
-    stroke: '#ff0000',
+    fill: '#af4154',
+    stroke: '#af4154',
     strokeLinecap: 'round',
     strokeLinejoin: 'round',
     strokeOpacity: 1,
@@ -331,50 +332,73 @@ export default function Main() {
               {/* TODO: Draw either normalized or actual lengths */}
             </svg>
           </div>
-          <Button
-            className="mt-3 d-print-none user-select-none"
-            variant="outline-primary"
-            onClick={() => {
-              // Pull the SVG from the DOM and crudely minify it by removing spaces.
-              const text = document.getElementById('main-design').innerHTML
-                .replaceAll(/\s+/gi, ' ')
-                .replaceAll(/\s*?"\s*?/gi, '"')
-                .replaceAll(/\s*?<\s*?/gi, '<')
-                .replaceAll(/\s*?>\s*?/gi, '>');
-              // Create a temporary element that is used to download the SVG as a file.
-              var element = document.createElement('a');
-              element.style.display = 'none';
-              element.setAttribute('href', 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(text));
-              element.setAttribute('download', 'interferometer.svg');
-              document.body.appendChild(element);
-              element.click();
-              document.body.removeChild(element);
-            }}
-            >
-              <TfiDownload /> Download SVG
-          </Button>
+          <ButtonGroup className="mt-3 d-print-none user-select-none">
+            <Button
+              variant="outline-primary"
+              onClick={() => {
+                // Pull the SVG from the DOM and crudely minify it by removing spaces.
+                const text = document.getElementById('main-design').innerHTML
+                  .replaceAll(/\s+/gi, ' ')
+                  .replaceAll(/\s*?"\s*?/gi, '"')
+                  .replaceAll(/\s*?<\s*?/gi, '<')
+                  .replaceAll(/\s*?>\s*?/gi, '>');
+                // Create a temporary element that is used to download the SVG as a file.
+                var element = document.createElement('a');
+                element.style.display = 'none';
+                element.setAttribute('href', 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(text));
+                element.setAttribute('download', 'interferometer.svg');
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+              }}
+              >
+                <TfiDownload /> Download SVG
+            </Button>
+            <Button
+              variant="outline-primary"
+              onClick={() => window.print()}
+              >
+                <TfiPrinter /> Print Summary
+            </Button>
+          </ButtonGroup>
         </Col>
       </Row>
       <Row className="py-3">
         <Col>
           <h1>Summary</h1>
           <ul>
+            <li>
+              The laser is modulated with an optical frequency modulation amplitude of
+              {' '}
+              <strong>&nu;<sub>A</sub> = {nuA / 1e9} GHz</strong>
+              {' '}
+              at a modulation frequency of
+              {' '}
+              <strong>f<sub>m</sub> = {fM / 1e3} kHz</strong>
+              .
+            </li>
             <li>This SFM interferometer uses a <strong>{configuration.toLowerCase().replace('_', ' ')}</strong> configuration.</li>
-            <li><strong>Measurements of {numMeasurements} unique targets</strong> are supported (out of a total <strong>{axisNames.length} interference axes</strong>).</li>
+            <li>
+              <strong>Measurement{numMeasurements > 1 ? 's' : ''} of {numMeasurements} unique target{numMeasurements > 1 ? 's' : ''}</strong>
+              {' '}
+              {numMeasurements > 1 ? 'are' : 'is'} supported
+              {' '}
+              (out of a total <strong>{axisNames.length} interference axes</strong>).
+            </li>
+            <li>
+              The maximum mechanical stroke for all axes is <strong>&Delta;x = {maxStroke} m</strong>.
+              {' '}
+              (This is the same for all axes, e.g., &Delta;x = &Delta;x<sub>&alpha;&beta;</sub> = &Delta;x<sub>&alpha;&gamma;</sub> = &hellip;)
+            </li>
+            <li>The mechanical separation between axes is <strong>x<sub>sep</sub> = {minSeparation} m</strong>.</li>
             <li>The normalized length <strong>{SOLUTIONS[numReflections][solution].name}</strong> solution is used.</li>
           </ul>
-          {/* TODO: Remove this */}
-          <div className="d-none">
-            <p>&nu;<sub>A</sub> = {nuA} Hz</p>
-            <p>f<sub>m</sub> = {fM} Hz</p>
-            <p>Max mechanical stroke = {maxStroke} m</p>
-            <p>Mechanical separation between axes = {minSeparation} m</p>
-          </div>
         </Col>
       </Row>
       <Row className="pt-3">
         <Col>
           <h1>Interferometer Characteristics</h1>
+          <p>The measurement axes are highlighted.</p>
           <Table bordered hover>
             <thead>
               <tr>
@@ -385,10 +409,9 @@ export default function Main() {
               </tr>
             </thead>
             <tbody>
-              {/* TODO Highlight the chosen axes somehow */}
               {axisNames.map((axisName, index) => {
                 return (
-                  <tr key={index} className={measurementNames.includes(axisName) ? 'bg-secondary-subtle' : ''}>
+                  <tr key={index} className={measurementNames.includes(axisName) ? 'bg-body-secondary' : ''}>
                     {/* The transparent background is necessary to show the tr background color. */}
                     <td className="bg-transparent">{axisName}</td>
                     <td className="bg-transparent"><span className="text-muted">Coming soon</span></td>
@@ -399,7 +422,6 @@ export default function Main() {
               })}
             </tbody>
           </Table>
-          {/* TODO: Remove this */}
         </Col>
       </Row>
     </Container>

@@ -133,9 +133,10 @@ export default function Sidebar() {
         value={maxStroke} onChange={handleMaxStroke}
         aria-label="Maximum mechanical stroke to be measured"
         />
+      {/* TODO: deselecting override always sets this to 0 */}
       <Entry
         type="number" min={0} max={10} step={0.01}
-        prefix={<>&Delta;x<sub>sep</sub></>} suffix="m"
+        prefix={<>x<sub>sep</sub></>} suffix="m"
         value={minSeparation} onChange={handleMinSeparation}
         automaticValue={automaticMinSeparation} onOverrideChange={setAutomaticMinSeparationOverride}
         aria-label="Minimum mechanical separation between axes"
