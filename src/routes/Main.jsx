@@ -11,6 +11,7 @@ import { TfiDownload, TfiPrinter } from 'react-icons/tfi';
 
 import { DataContext } from '../App';
 import Configuration from '../model/Configuration';
+import Constants from '../model/Constants';
 import MathUtils from '../model/MathUtils';
 import SOLUTIONS from '../model/Solutions';
 
@@ -22,9 +23,6 @@ function zip(...args) {
 
 // The single character labels that can be used for each reflection.
 const reflectionLabels = 'αβγδεζηθικλμνξοπρστυφχψω';
-
-// Speed of light in a vacuum (m/s).
-const speedOfLight = 299792458;
 
 // TODO: Remove 1x1 coupler when only 1 axis is used.
 export default function Main() {
@@ -436,7 +434,7 @@ export default function Main() {
                       // The factor of 2 is necessary to convert the mechanical length to the optical path difference.
                       let opd = axisNormalizedLengths[index] * minSeparation * 2;
                       // See Eq. 3.24 in: A. Christiansen. "A cryogenic multiaxis range-resolved laser interferometer". Doctoral thesis, University of Lethbridge, 2024. Handle: 10133/6671.
-                      let fBeat = 2 * Math.PI * nuA * fM * opd / speedOfLight;
+                      let fBeat = 2 * Math.PI * nuA * fM * opd / Constants.speedOfLight;
                       return MathUtils.roundTo(fBeat / 1e6, 1); // Convert to MHz.
                     })()}</td>
                   </tr>

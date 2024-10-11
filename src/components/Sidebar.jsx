@@ -6,6 +6,7 @@ import Configuration, { computeNumReflections } from '../model/Configuration';
 import Dropdown from './Dropdown';
 import Entry from './Entry';
 import Logo from '../assets/logo.svg?react';
+import Constants from '../model/Constants';
 import MathUtils from '../model/MathUtils';
 import SOLUTIONS from '../model/Solutions';
 
@@ -35,10 +36,10 @@ export default function Sidebar() {
   const [automaticMinSeparation, setAutomaticMinSeparation] = useState(0);
   const [automaticMinSeparationOverride, setAutomaticMinSeparationOverride] = useState(false);
   const handleAutomaticMinSeparation = () => {
-    const c = 299792458; // m/s.
+    // TODO Put w in constants?
     const w = 2.5; // Recommended from A. Christiansen PhD thesis: https://hdl.handle.net/10133/6671.
-    const sigma = 0.0225; // TODO Put sigma in a state.
-    const minSepOpd = (w * c) / (2 * Math.sqrt(2) * Math.PI ** 2 * nuA * sigma);
+    const sigma = 0.0225; // TODO Put sigma in a state or Constants.
+    const minSepOpd = (w * Constants.speedOfLight) / (2 * Math.sqrt(2) * Math.PI ** 2 * nuA * sigma);
     // Multiply by 0.5 to convert from optical to mechanical.
     const minSep = MathUtils.roundTo(0.5 * minSepOpd, 2);
     setAutomaticMinSeparation(minSep);
