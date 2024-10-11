@@ -82,7 +82,11 @@ export default function Main() {
 
   // Design rule checks that are displayed as warnings.
   const warnings = [];
-  if (minSeparation < recommendedMinSeparation({ nuA })) {
+  if (nuA <= 0) {
+    warnings.push(<>&nu;<sub>A</sub> must be a positive value.</>);
+  }
+  // The 1.001 is just to provide some tolerance for floating point errors.
+  if (1.001 * minSeparation < recommendedMinSeparation({ nuA })) {
     warnings.push((
       <>
         The separation between axes, &Delta;x<sub>sep</sub>
