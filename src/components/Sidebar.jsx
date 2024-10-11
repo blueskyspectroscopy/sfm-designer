@@ -2,11 +2,10 @@ import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { DataContext } from '../App';
-import Configuration, { computeNumReflections } from '../model/Configuration';
+import Configuration, { computeNumReflections, recommendedMinSeparation } from '../model/Configuration';
 import Dropdown from './Dropdown';
 import Entry from './Entry';
 import Logo from '../assets/logo.svg?react';
-import Constants from '../model/Constants';
 import MathUtils from '../model/MathUtils';
 import SOLUTIONS from '../model/Solutions';
 
@@ -34,24 +33,19 @@ export default function Sidebar() {
   // changed. Some extra logic is required for that.
   const [automaticMinSeparation, setAutomaticMinSeparation] = useState(0);
   const [automaticMinSeparationOverride, setAutomaticMinSeparationOverride] = useState(false);
-  const handleAutomaticMinSeparation = () => {
-    // TODO Put w in constants?
-    const w = 2.5; // Recommended from A. Christiansen PhD thesis: https://hdl.handle.net/10133/6671.
-    const sigma = 0.0225; // TODO Put sigma in a state or Constants.
-    const minSepOpd = (w * Constants.speedOfLight) / (2 * Math.sqrt(2) * Math.PI ** 2 * nuA * sigma);
-    // Multiply by 0.5 to convert from optical to mechanical.
-    const minSep = MathUtils.roundTo(0.5 * minSepOpd, 2);
-    setAutomaticMinSeparation(minSep);
+  const handleAutomaticMinSeparation = (newNuA) => {
+    const automatic = MathUtils.roundTo(recommendedMinSeparation({ nuA: newNuA }), 3);
+    setAutomaticMinSeparation(automatic);
     if (!automaticMinSeparationOverride) {
-      setMinSeparation(automaticMinSeparation);
+      setMinSeparation(automatic);
     }
   };
 
-  // TODO: move MathUtils.roundTo calls into here.
   // Functions to update the exported state.
   const handleNuA = (e) => {
-    setNuA(e.target.value * GHZ_TO_HZ);
-    handleAutomaticMinSeparation();
+    let newNuA = e.target.value * GHZ_TO_HZ;
+    setNuA(newNuA);
+    handleAutomaticMinSeparation(newNuA);
   };
   const handleFM = (e) => setFM(e.target.value * KHZ_TO_HZ);
   const handleNumMeasuremnts = (e) => {
@@ -121,7 +115,6 @@ export default function Sidebar() {
         aria-label="The interferometer configuration style"
         />
       {/* TODO: deselecting override always sets this to 0. */}
-      {/* TODO: the first change of nuA after reloading a page always sets this to 0. */}
       <Entry
         type="number" min={0} max={10} step={0.01}
         prefix={<>x<sub>sep</sub></>} suffix="m"
