@@ -31,7 +31,6 @@ export default function Main() {
     fM,
     numMeasurements,
     configuration,
-    maxStroke,
     minSeparation,
     solution,
     numReflections,
@@ -399,16 +398,19 @@ export default function Main() {
               {' '}
               (out of a total <strong>{axisNames.length} interference axes</strong>).
             </li>
+            <li>The recommended mechanical separation between axes is <strong>x<sub>sep</sub> = {minSeparation} m</strong>.</li>
             <li>
-              The maximum mechanical stroke for all axes is <strong>&Delta;x<sub>max</sub> = {maxStroke} m</strong>.
+              The maximum recommended mechanical stroke for all axes is <strong>&Delta;x<sub>max</sub> = {MathUtils.roundTo(minSeparation / 4, 3)} m</strong>.
               {' '}
-              (This is the same for all axes, e.g., &Delta;x<sub>max</sub> = &Delta;x<sub>&alpha;&beta;</sub> = &Delta;x<sub>&alpha;&gamma;</sub> = &hellip;)
+              <span className="text-muted">
+                (This is the same for all axes, e.g., &Delta;x<sub>max</sub> = &Delta;x<sub>&alpha;&beta;</sub> = &Delta;x<sub>&alpha;&gamma;</sub> = &hellip;)
+              </span>
             </li>
-            <li>The mechanical separation between axes is <strong>x<sub>sep</sub> = {minSeparation} m</strong>.</li>
             <li>The normalized length <strong>{SOLUTIONS[numReflections][solution].name}</strong> solution is used.</li>
           </ul>
         </Col>
       </Row>
+      {/* TODO: Add warnings for bad constraints. This is just based on the minSeparation. */}
       <Row className="pt-3">
         <Col>
           <h1>Interferometer Characteristics</h1>
@@ -418,7 +420,7 @@ export default function Main() {
               <tr>
                 <th>Axis</th>
                 <th>Normalized Length</th>
-                <th>Actual Length (m)</th>
+                <th>Mechanical Length (m)</th>
                 <th>Beat Frequency Bandwidth (MHz)</th>
               </tr>
             </thead>

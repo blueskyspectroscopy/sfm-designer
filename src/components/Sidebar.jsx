@@ -25,7 +25,6 @@ export default function Sidebar() {
     fM, setFM,
     numMeasurements, setNumMeasurements,
     configuration, setConfiguration,
-    maxStroke, setMaxStroke,
     minSeparation, setMinSeparation,
     solution, setSolution,
     numReflections, setNumReflections,
@@ -44,7 +43,7 @@ export default function Sidebar() {
     const minSep = MathUtils.roundTo(0.5 * minSepOpd, 2);
     setAutomaticMinSeparation(minSep);
     if (!automaticMinSeparationOverride) {
-      setMinSeparation(minSep);
+      setMinSeparation(automaticMinSeparation);
     }
   };
 
@@ -69,7 +68,6 @@ export default function Sidebar() {
     }));
     setSolution(0);
   }
-  const handleMaxStroke = (e) => setMaxStroke(e.target.value);
   const handleMinSeparation = (e) => {
     if (e.type == 'automaticvalue') {
       setMinSeparation(e.detail.value);
@@ -122,13 +120,8 @@ export default function Sidebar() {
         ]}
         aria-label="The interferometer configuration style"
         />
-      <Entry
-        type="number" min={0} max={10} step={0.01}
-        prefix={<>&Delta;x<sub>max</sub></>} suffix="m"
-        value={maxStroke} onChange={handleMaxStroke}
-        aria-label="Maximum mechanical stroke to be measured"
-        />
-      {/* TODO: deselecting override always sets this to 0 */}
+      {/* TODO: deselecting override always sets this to 0. */}
+      {/* TODO: the first change of nuA after reloading a page always sets this to 0. */}
       <Entry
         type="number" min={0} max={10} step={0.01}
         prefix={<>x<sub>sep</sub></>} suffix="m"
