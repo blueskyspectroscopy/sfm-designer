@@ -10,7 +10,7 @@ import Table from 'react-bootstrap/Table';
 import { TfiDownload, TfiPrinter } from 'react-icons/tfi';
 
 import { DataContext } from '../App';
-import Configuration from '../model/Configuration';
+import Configuration, { recommendedMinSeparation } from '../model/Configuration';
 import Constants from '../model/Constants';
 import MathUtils from '../model/MathUtils';
 import SOLUTIONS from '../model/Solutions';
@@ -74,6 +74,24 @@ export default function Main() {
       break;
     default:
       console.error(`Invalid configuration: ${configuration}. Not drawing motion labels.`);
+  }
+
+  // TODO: Explain this.
+  // TODO: Is this computed correctly? Is the 4 the right value?
+  const recommendedMaxStroke = Math.min(minSeparation / 4, recommendedMinSeparation({ nuA }) / 4);
+
+  // Design rule checks that are displayed as warnings.
+  const warnings = [];
+  if (minSeparation < recommendedMinSeparation({ nuA })) {
+    warnings.push((
+      <>
+        The separation between axes, &Delta;x<sub>sep</sub>
+        {' '}
+        is smaller than the minimum recommended value of {MathUtils.roundTo(recommendedMinSeparation({ nuA }), 3)} m.
+        {' '}
+        Crosstalk may have a larger effect compared to recommended operating conditions.
+      </>
+    ));
   }
 
   // Generic lengths.
@@ -398,9 +416,9 @@ export default function Main() {
               {' '}
               (out of a total <strong>{axisNames.length} interference axes</strong>).
             </li>
-            <li>The recommended mechanical separation between axes is <strong>x<sub>sep</sub> = {minSeparation} m</strong>.</li>
+            <li>The minimum recommended mechanical separation between axes of <strong>x<sub>sep</sub> = {minSeparation} m</strong> is used.</li>
             <li>
-              The maximum recommended mechanical stroke for all axes is <strong>&Delta;x<sub>max</sub> = {MathUtils.roundTo(minSeparation / 4, 3)} m</strong>.
+              The maximum recommended mechanical stroke for all axes is <strong>&Delta;x<sub>max</sub> = {MathUtils.roundTo(recommendedMaxStroke, 3)} m</strong>.
               {' '}
               <span className="text-muted">
                 (This is the same for all axes, e.g., &Delta;x<sub>max</sub> = &Delta;x<sub>&alpha;&beta;</sub> = &Delta;x<sub>&alpha;&gamma;</sub> = &hellip;)
@@ -410,7 +428,16 @@ export default function Main() {
           </ul>
         </Col>
       </Row>
-      {/* TODO: Add warnings for bad constraints. This is just based on the minSeparation. */}
+      {warnings.length > 0 && (
+        <Row className="py-3 bg-warning-subtle border border-warning rounded">
+          <Col>
+            <h1>Warnings</h1>
+            <ul>
+              {warnings.map((warning, index) => <li key={index}>{warning}</li>)}
+            </ul>
+          </Col>
+        </Row>
+      )}
       <Row className="pt-3">
         <Col>
           <h1>Interferometer Characteristics</h1>
