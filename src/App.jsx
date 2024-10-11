@@ -10,6 +10,8 @@ import Footer from './components/Footer';
 import Main from './routes/Main';
 import NotFound from './routes/NotFound';
 import Sidebar from './components/Sidebar';
+import MathUtils from './model/MathUtils';
+import { recommendedMinSeparation } from './model/Configuration';
 
 // This context is used to pass all of the model data to components.
 export const DataContext = createContext(null);
@@ -19,7 +21,7 @@ export default function App() {
   const [fM, setFM] = useState(1e5); // Hz.
   const [numMeasurements, setNumMeasurements] = useState(2);
   const [configuration, setConfiguration] = useState(Configuration.SHARED_REFERENCE);
-  const [minSeparation, setMinSeparation] = useState(0.5); // m.
+  const [minSeparation, setMinSeparation] = useState(MathUtils.roundTo(recommendedMinSeparation({ nuA }), 3)); // m
   const [solution, setSolution] = useState(0);
   const [numReflections, setNumReflections] = useState(computeNumReflections({
     configuration, numMeasurements
