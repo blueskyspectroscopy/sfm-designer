@@ -6,6 +6,7 @@ import Configuration, { computeNumReflections } from '../model/Configuration';
 import Dropdown from './Dropdown';
 import Entry from './Entry';
 import Logo from '../assets/logo.svg?react';
+import MathUtils from '../model/MathUtils';
 import SOLUTIONS from '../model/Solutions';
 
 /* eslint-disable no-unused-vars */
@@ -16,12 +17,6 @@ const KHZ_TO_HZ = 1e3;
 const MHZ_TO_HZ = 1e6;
 const GHZ_TO_HZ = 1e9;
 /* eslint-enable no-unused-vars */
-
-// n is the number or descimal places.
-const roundTo = (x, n) => {
-  const d = 10 ** n;
-  return Math.round(d * x) / d;
-}
 
 export default function Sidebar() {
   const {
@@ -45,14 +40,14 @@ export default function Sidebar() {
     const sigma = 0.0225; // TODO Put sigma in a state.
     const minSepOpd = (w * c) / (2 * Math.sqrt(2) * Math.PI ** 2 * nuA * sigma);
     // Multiply by 0.5 to convert from optical to mechanical.
-    const minSep = roundTo(0.5 * minSepOpd, 2);
+    const minSep = MathUtils.roundTo(0.5 * minSepOpd, 2);
     setAutomaticMinSeparation(minSep);
     if (!automaticMinSeparationOverride) {
       setMinSeparation(minSep);
     }
   };
 
-  // TODO: move roundTo calls into here.
+  // TODO: move MathUtils.roundTo calls into here.
   // Functions to update the exported state.
   const handleNuA = (e) => {
     setNuA(e.target.value * GHZ_TO_HZ);
@@ -99,13 +94,13 @@ export default function Sidebar() {
       <Entry
         type="number" min={0} max={100} step={0.1}
         prefix={<>&nu;<sub>A</sub></>} suffix="GHz"
-        value={roundTo(nuA * HZ_TO_GHZ, 6)} onChange={handleNuA}
+        value={MathUtils.roundTo(nuA * HZ_TO_GHZ, 6)} onChange={handleNuA}
         aria-label="Optical frequency modulation amplitude"
         />
       <Entry
         type="number" min={0} max={1000} step={1}
         prefix={<>f<sub>m</sub></>} suffix="kHz"
-        value={roundTo(fM * HZ_TO_KHZ, 6)} onChange={handleFM}
+        value={MathUtils.roundTo(fM * HZ_TO_KHZ, 6)} onChange={handleFM}
         aria-label="Modulation frequency"
         />
       <Dropdown

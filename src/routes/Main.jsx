@@ -11,6 +11,7 @@ import { TfiDownload, TfiPrinter } from 'react-icons/tfi';
 
 import { DataContext } from '../App';
 import Configuration from '../model/Configuration';
+import MathUtils from '../model/MathUtils';
 import SOLUTIONS from '../model/Solutions';
 
 // The classic zip functions for an arbitrary number of arrays.
@@ -21,6 +22,9 @@ function zip(...args) {
 
 // The single character labels that can be used for each reflection.
 const reflectionLabels = 'αβγδεζηθικλμνξοπρστυφχψω';
+
+// Speed of light in a vacuum (m/s).
+const speedOfLight = 299792458;
 
 // TODO: Remove 1x1 coupler when only 1 axis is used.
 export default function Main() {
@@ -48,6 +52,18 @@ export default function Main() {
       }
     }
     return names;
+  })();
+
+  // The normalized lengths of all axes.
+  const axisNormalizedLengths = (() => {
+    let lengths = [];
+    for (let i = 0; i < numReflections; i++) {
+      for (let j = i + 1; j < numReflections; j++) {
+        let s = SOLUTIONS[numReflections][solution].solution;
+        lengths.push(Math.abs(s[i] - s[j]));
+      }
+    }
+    return lengths;
   })();
 
   // The names of the measurement axes.
@@ -386,9 +402,9 @@ export default function Main() {
               (out of a total <strong>{axisNames.length} interference axes</strong>).
             </li>
             <li>
-              The maximum mechanical stroke for all axes is <strong>&Delta;x = {maxStroke} m</strong>.
+              The maximum mechanical stroke for all axes is <strong>&Delta;x<sub>max</sub> = {maxStroke} m</strong>.
               {' '}
-              (This is the same for all axes, e.g., &Delta;x = &Delta;x<sub>&alpha;&beta;</sub> = &Delta;x<sub>&alpha;&gamma;</sub> = &hellip;)
+              (This is the same for all axes, e.g., &Delta;x<sub>max</sub> = &Delta;x<sub>&alpha;&beta;</sub> = &Delta;x<sub>&alpha;&gamma;</sub> = &hellip;)
             </li>
             <li>The mechanical separation between axes is <strong>x<sub>sep</sub> = {minSeparation} m</strong>.</li>
             <li>The normalized length <strong>{SOLUTIONS[numReflections][solution].name}</strong> solution is used.</li>
@@ -404,8 +420,8 @@ export default function Main() {
               <tr>
                 <th>Axis</th>
                 <th>Normalized Length</th>
-                <th>Actual Length</th>
-                <th>Beat Frequency Bandwidth</th>
+                <th>Actual Length (m)</th>
+                <th>Beat Frequency Bandwidth (MHz)</th>
               </tr>
             </thead>
             <tbody>
@@ -414,9 +430,15 @@ export default function Main() {
                   <tr key={index} className={measurementNames.includes(axisName) ? 'bg-body-secondary' : ''}>
                     {/* The transparent background is necessary to show the tr background color. */}
                     <td className="bg-transparent">{axisName}</td>
-                    <td className="bg-transparent"><span className="text-muted">Coming soon</span></td>
-                    <td className="bg-transparent"><span className="text-muted">Coming soon</span></td>
-                    <td className="bg-transparent"><span className="text-muted">Coming soon</span></td>
+                    <td className="bg-transparent">{axisNormalizedLengths[index]}</td>
+                    <td className="bg-transparent">{MathUtils.roundTo(axisNormalizedLengths[index] * minSeparation, 3)}</td>
+                    <td className="bg-transparent">{(() => {
+                      // The factor of 2 is necessary to convert the mechanical length to the optical path difference.
+                      let opd = axisNormalizedLengths[index] * minSeparation * 2;
+                      // See Eq. 3.24 in: A. Christiansen. "A cryogenic multiaxis range-resolved laser interferometer". Doctoral thesis, University of Lethbridge, 2024. Handle: 10133/6671.
+                      let fBeat = 2 * Math.PI * nuA * fM * opd / speedOfLight;
+                      return MathUtils.roundTo(fBeat / 1e6, 1); // Convert to MHz.
+                    })()}</td>
                   </tr>
                 );
               })}
