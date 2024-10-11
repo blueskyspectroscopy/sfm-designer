@@ -19,7 +19,6 @@ export default function App() {
   const [fM, setFM] = useState(1e5); // Hz.
   const [numMeasurements, setNumMeasurements] = useState(2);
   const [configuration, setConfiguration] = useState(Configuration.SHARED_REFERENCE);
-  const [maxStroke, setMaxStroke] = useState(0.15); // m.
   const [minSeparation, setMinSeparation] = useState(0.5); // m.
   const [solution, setSolution] = useState(0);
   const [numReflections, setNumReflections] = useState(computeNumReflections({
@@ -30,7 +29,6 @@ export default function App() {
     fM, setFM,
     numMeasurements, setNumMeasurements,
     configuration, setConfiguration,
-    maxStroke, setMaxStroke,
     minSeparation, setMinSeparation,
     solution, setSolution,
     numReflections, setNumReflections,
