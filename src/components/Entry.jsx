@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import Button from 'react-bootstrap/Button';
@@ -6,21 +6,21 @@ import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 
 export default function Entry({
-    prefix, suffix = null, automaticValue = null, onOverrideChange = null,
-    value = null, onChange = null, ...props
+    prefix, suffix = null,
+    value, onChange = null,
+    overrideState = null,
+    ...props
   }) {
-  const [override, setOverride] = useState(false);
   const handleOverride = () => {
-    const newOverride = !override;
-    setOverride(newOverride);
-    onOverrideChange(newOverride); // Notify the new override value.
+    const newOverride = !overrideState.override;
+    overrideState.setOverride(newOverride);
     if (!newOverride) {
-      const event = new CustomEvent('automaticvalue', { detail: { value: automaticValue }});
+      const event = new CustomEvent('overridevalue', { detail: { value: overrideState.overrideValue }});
       onChange(event);
     }
   };
   const handleChange = (e) => {
-    if (automaticValue == null || override) {
+    if (overrideState == null || overrideState.override) {
       onChange(e)
     }
   };
@@ -28,13 +28,13 @@ export default function Entry({
     <InputGroup className="my-3">
       <InputGroup.Text>{prefix}</InputGroup.Text>
       <Form.Control
-        disabled={automaticValue != null && !override}
+        disabled={overrideState != null && !overrideState.override}
         value={value} onChange={handleChange}
         {...props}
         />
       { suffix && <InputGroup.Text>{suffix}</InputGroup.Text> }
-      { automaticValue != null &&
-        <Button variant={override ? 'primary' : 'outline-secondary'} onClick={handleOverride}>
+      { overrideState != null &&
+        <Button variant={overrideState.override ? 'primary' : 'outline-secondary'} onClick={handleOverride}>
           Override
         </Button>
       }
@@ -43,10 +43,13 @@ export default function Entry({
 }
 
 Entry.propTypes = {
+  onChange: PropTypes.func,
+  overrideState: PropTypes.shape({
+    override: PropTypes.bool.isRequired,
+    setOverride: PropTypes.func.isRequired,
+    overrideValue: PropTypes.node.isRequired,
+  }),
   prefix: PropTypes.node.isRequired,
   suffix: PropTypes.node,
-  automaticValue: PropTypes.node,
-  onOverrideChange: PropTypes.func,
   value: PropTypes.node,
-  onChange: PropTypes.func,
 };

@@ -31,21 +31,23 @@ export default function Sidebar() {
 
   // The minimum separation is automatically updated when the nuA input is
   // changed. Some extra logic is required for that.
-  const [automaticMinSeparation, setAutomaticMinSeparation] = useState(0);
-  const [automaticMinSeparationOverride, setAutomaticMinSeparationOverride] = useState(false);
-  const handleAutomaticMinSeparation = (newNuA) => {
-    const automatic = MathUtils.roundTo(recommendedMinSeparation({ nuA: newNuA }), 3);
-    setAutomaticMinSeparation(automatic);
-    if (!automaticMinSeparationOverride) {
-      setMinSeparation(automatic);
-    }
+  const [overrideMinSeparation, setOverrideMinSeparation] = useState(MathUtils.roundTo(recommendedMinSeparation({ nuA }), 3));
+  const [useMinSeparationOverride, setUseMinSeparationOverride] = useState(false);
+  const overrideMinSeparationState = {
+    override: useMinSeparationOverride,
+    setOverride: setUseMinSeparationOverride,
+    overrideValue: overrideMinSeparation,
   };
 
   // Functions to update the exported state.
   const handleNuA = (e) => {
     let newNuA = e.target.value * GHZ_TO_HZ;
     setNuA(newNuA);
-    handleAutomaticMinSeparation(newNuA);
+    const newRecommendedMinSeparation = MathUtils.roundTo(recommendedMinSeparation({ nuA: newNuA }), 3);
+    setOverrideMinSeparation(newRecommendedMinSeparation);
+    if (!overrideMinSeparationState.override) {
+      setMinSeparation(newRecommendedMinSeparation);
+    }
   };
   const handleFM = (e) => setFM(e.target.value * KHZ_TO_HZ);
   const handleNumMeasuremnts = (e) => {
@@ -61,14 +63,10 @@ export default function Sidebar() {
       configuration: e.target.value, numMeasurements,
     }));
     setSolution(0);
-  }
+  };
   const handleMinSeparation = (e) => {
-    if (e.type == 'automaticvalue') {
-      setMinSeparation(e.detail.value);
-    } else {
-      setMinSeparation(e.target.value);
-    }
-  }
+    setMinSeparation(e.type == 'overridevalue' ? e.detail.value : e.target.value);
+  };
   const handleSolution = (e) => setSolution(e.target.value);
 
   return (
@@ -114,12 +112,11 @@ export default function Sidebar() {
         ]}
         aria-label="The interferometer configuration style"
         />
-      {/* TODO: deselecting override always sets this to 0. */}
       <Entry
         type="number" min={0} max={10} step={0.01}
         prefix={<>x<sub>sep</sub></>} suffix="m"
         value={minSeparation} onChange={handleMinSeparation}
-        automaticValue={automaticMinSeparation} onOverrideChange={setAutomaticMinSeparationOverride}
+        overrideState={overrideMinSeparationState}
         aria-label="Minimum mechanical separation between axes"
         />
       <Dropdown
