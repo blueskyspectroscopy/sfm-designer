@@ -261,24 +261,34 @@ export default function Main() {
                 );
               })}
               {/* Coupler */}
-              <>
-                <path style={componentStyle}
+              {numMeasurements == 1 && (
+                <path style={fibreStyle}
                   d={`
-                    M${couplerX - 0.5 * couplerW} ${couplerY + 0.5 * couplerH}
-                    l${0} ${-couplerH}
+                    M${couplerX - 0.5 * couplerW} ${couplerY}
                     l${couplerW} ${0}
-                    l${0} ${couplerH}
-                    l${-couplerW} ${0}
-                    z
                     `}
+                />
+              )}
+              {numMeasurements > 1 && (
+                <>
+                  <path style={componentStyle}
+                    d={`
+                      M${couplerX - 0.5 * couplerW} ${couplerY + 0.5 * couplerH}
+                      l${0} ${-couplerH}
+                      l${couplerW} ${0}
+                      l${0} ${couplerH}
+                      l${-couplerW} ${0}
+                      z
+                      `}
                   />
-                <text
-                  x={couplerX} y={couplerY - 0.5 * couplerH - textShift}
-                  fontSize={fontSize} textAnchor="middle"
-                  >
-                  1&times;{numMeasurements}
-                </text>
-              </>
+                  <text
+                    x={couplerX} y={couplerY - 0.5 * couplerH - textShift}
+                    fontSize={fontSize} textAnchor="middle"
+                    >
+                    1&times;{numMeasurements}
+                  </text>
+                </>
+              )}
               {/* Collimators */}
               {collimatorYs.map((collimatorY, index) => {
                 return (
