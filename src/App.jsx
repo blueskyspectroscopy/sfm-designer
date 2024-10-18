@@ -40,8 +40,10 @@ export default function App() {
       <DataContext.Provider value={dataContextValue}>
         <Container fluid>
           <Row className="min-vh-100">
-            <Col md={6} lg={5} xl={4} className="p-3 bg-light border-end d-print-none user-select-none">
-              <Sidebar />
+            <Col md={6} lg={5} xl={4} className="bg-light border-end d-print-none user-select-none">
+              <div className="sticky-top p-3">
+                <Sidebar />
+              </div>
             </Col>
             <Col className="p-3">
               <Routes>
