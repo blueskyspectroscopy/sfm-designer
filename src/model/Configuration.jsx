@@ -30,6 +30,7 @@ const bandSeparationCoefficient = 2.5;
 // The recommended value taken from: T Kissinger PhD thesis. http://dspace.lib.cranfield.ac.uk/handle/1826/9598.
 const sigma = 0.0225;
 
+// Computes the recommended minimum separation in mechanical path.
 export function recommendedMinSeparation({ nuA }) {
   const minSeparationOpd = (bandSeparationCoefficient * Constants.speedOfLight) / (2 * Math.sqrt(2) * Math.PI ** 2 * nuA * sigma);
   return 0.5 * minSeparationOpd; // Multiply by 0.5 to convert from optical to mechanical.

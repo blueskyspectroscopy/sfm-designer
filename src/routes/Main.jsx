@@ -89,7 +89,7 @@ export default function Main() {
   if (1.001 * minSeparation < recommendedMinSeparation({ nuA })) {
     warnings.push((
       <>
-        The separation between axes, &Delta;x<sub>sep</sub>
+        The separation between axes, &Delta;x<sub>sep</sub>,
         {' '}
         is smaller than the minimum recommended value of {MathUtils.roundTo(recommendedMinSeparation({ nuA }), 3)} m.
         {' '}
@@ -410,7 +410,7 @@ export default function Main() {
       </Row>
       <Row className="py-3">
         <Col>
-          <h1>Summary</h1>
+          <h1>Parameters</h1>
           <ul>
             <li>
               The laser is modulated with an optical frequency modulation amplitude of
@@ -430,30 +430,29 @@ export default function Main() {
               {' '}
               (out of a total <strong>{axisNames.length} interference axes</strong>).
             </li>
-            <li>The minimum recommended mechanical separation between axes of <strong>x<sub>sep</sub> = {minSeparation} m</strong> is used.</li>
-            <li>
-              The maximum recommended mechanical stroke for all axes is <strong>&Delta;x<sub>max</sub> = {MathUtils.roundTo(recommendedMaxStroke, 3)} m</strong>.
-              {' '}
-              <span className="text-muted">
-                (This is the same for all axes, e.g., &Delta;x<sub>max</sub> = &Delta;x<sub>&alpha;&beta;</sub> = &Delta;x<sub>&alpha;&gamma;</sub> = &hellip;)
-              </span>
-            </li>
+            <li>A mechanical separation of <strong>x<sub>sep</sub> = {minSeparation} m</strong> between axes is used.</li>
             <li>The normalized length <strong>{SOLUTIONS[numReflections][solution].name}</strong> solution is used.</li>
           </ul>
-        </Col>
-      </Row>
-      {warnings.length > 0 && (
-        <Row className="py-3 bg-warning-subtle border border-warning rounded">
-          <Col>
-            <h1>Warnings</h1>
-            <ul>
-              {warnings.map((warning, index) => <li key={index}>{warning}</li>)}
-            </ul>
-          </Col>
-        </Row>
-      )}
-      <Row className="pt-3">
-        <Col>
+          <h1>Recommendations</h1>
+          <ul>
+            <li>
+              The <strong>maximum recommended mechanical stroke</strong> for all axes is
+              {' '}
+              <strong>{MathUtils.roundTo(recommendedMaxStroke, 3)} m</strong>.
+              {' '}
+              <span className="text-muted">
+                (This is the same for all axes.)
+              </span>
+            </li>
+          </ul>
+          {warnings.length > 0 && (
+            <div className="p-3 bg-warning-subtle border border-warning rounded">
+              <h1>Warnings</h1>
+              <ul>
+                {warnings.map((warning, index) => <li key={index}>{warning}</li>)}
+              </ul>
+            </div>
+          )}
           <h1>Interferometer Characteristics</h1>
           <p>The measurement axes are highlighted.</p>
           <Table bordered hover>
