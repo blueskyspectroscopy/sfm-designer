@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Route, Routes } from 'react-router-dom';
 
 import { DataContext } from '../App';
 import Configuration, { computeNumReflections, recommendedMinSeparation } from '../model/Configuration';
@@ -8,6 +8,8 @@ import Entry from './Entry';
 import Logo from '../assets/logo.svg?react';
 import MathUtils from '../model/MathUtils';
 import SOLUTIONS from '../model/Solutions';
+import NavBackToAppButton from './NavBackToAppButton';
+import NavDocsButton from './NavDocsButton';
 
 /* eslint-disable no-unused-vars */
 const HZ_TO_KHZ = 1e-3;
@@ -81,6 +83,10 @@ export default function Sidebar() {
         <p className="text-muted">
           A calculator for sinusoidal frequency modulation (SFM) interferometer layouts.
         </p>
+        <Routes>
+          <Route path="/" Component={NavDocsButton} />
+          <Route path="*" Component={NavBackToAppButton} />
+        </Routes>
       </nav>
       <Entry
         type="number" min={0} max={100} step={0.1}
