@@ -6,11 +6,12 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 
 import Configuration, { computeNumReflections } from './model/Configuration';
+import Docs from './routes/Docs';
 import Footer from './components/Footer';
 import Main from './routes/Main';
+import MathUtils from './model/MathUtils';
 import NotFound from './routes/NotFound';
 import Sidebar from './components/Sidebar';
-import MathUtils from './model/MathUtils';
 import { recommendedMinSeparation } from './model/Configuration';
 
 // This context is used to pass all of the model data to components.
@@ -48,6 +49,7 @@ export default function App() {
             <Col className="p-3">
               <Routes>
                 <Route path="/" element={<Main />} />
+                <Route path="/docs" element={<Docs />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <Footer />

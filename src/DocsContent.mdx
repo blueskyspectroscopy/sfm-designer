@@ -1,0 +1,85 @@
+import Anchor from './components/Anchor';
+
+export const NuA = () => (<>&nu;<sub>A</sub></>);
+export const FM = () => (<>f<sub>m</sub></>);
+export const XSep = () => (<>x<sub>sep</sub></>);
+
+export const Ref = ({ name }) => (
+  <a href="#references">
+    [
+    {{
+      christiansen2024phd: '1',
+      kissinger2015range: '2',
+    }[name]}
+    ]
+  </a>
+);
+
+# SFM Designer Docs
+
+This tool is based on the work of Christiansen <Ref name="christiansen2024phd" />
+in the modeling of range-resolved interferometers based on sinusoidal optical
+frequency modulation (SFM). It is recommended to read chapter 3 of Christiansen
+<Ref name="christiansen2024phd" />, and the following assumptions are made in
+the tool based on that work:
+
+- The Gaussian window function of equations 3.9 and 3.31 of Christiansen
+  <Ref name="christiansen2024phd" /> is applied. A width of &sigma; = 0.0225 is
+  used as recommended by Kissinger et al. <Ref name="kissinger2015range" />.
+- The band separation coefficient of w = 2.5 is used as recommended by
+  equation 3.40 by Christiansen <Ref name="christiansen2024phd" />.
+
+## Parameters
+
+These are the parameters that can be entered into the model.
+
+- <NuA /> is the amplitude of the optical frequency modulation. For example, a
+  <NuA /> of 1 GHz means that the laser is modulated &pm;1 GHz about its
+  central frequency.
+- <FM /> is the modulation frequency, which is the rate of the sinusoidal
+  optical frequency modulation.
+- The number of measurements refers to how many independent measurements are
+  desired. Note that this is not equal to the number of interference axes, and
+  will always be less than the total number of axes (refer to section 3.2.1 of
+  Christiansen <Ref name="christiansen2024phd" />).
+- Configuration describes the overall interferometer layout.
+  - Shared Reference: the same interferometric reference is used for all
+    measurements. This has the advantage of generating simpler interferometers;
+    however, it carries the disadvantage that optical paths must often be made
+    up in fiber to achieve the desired band spacing, making the measurements
+    much more temperature sensitive.
+  - Unique References: separate interferometric references are used for each
+    measurement. This has the advantages of increased flexibility and reduced
+    temperature sensitivity, but the disadvantages of increased complexity and
+    a greater required signal processing bandwidth.
+- <XSep /> is the spacing in mechanical path between interference axes. This is
+  computed automatically using equation 3.42 in Christiansen
+  <Ref name="christiansen2024phd" />. It can optionally be overridden; however,
+  this is not recommended for inexperienced users.
+- The solution is the normalized solution set described in section 3.4 of
+  Christiansen <Ref name="christiansen2024phd" />. The solution is normalized
+  by <XSep />, and represents the relative lengths of all paths through the
+  interferometer. There are infinitely many solutions to any configuration;
+  however, only the solutions with the smallest optical lengths are shown.
+
+## References
+
+<ol className="ps-0 list-unstyled">
+  <li className="d-flex">
+    <div className="text-end text-muted user-select-none me-3" style={{minWidth: '2rem'}}>[1]</div>
+    <div className="flex-grow-1">
+      A. Christiansen. "A cryogenic multiaxis range-resolved laser interferometer".
+      Doctoral thesis, University of Lethbridge, 2024.
+      <Anchor href="https://hdl.handle.net/10133/6671">Handle: 10133/6671</Anchor>
+    </div>
+  </li>
+  <li className="d-flex">
+    <div className="text-end text-muted user-select-none me-3" style={{minWidth: '2rem'}}>[2]</div>
+    <div className="flex-grow-1">
+      T. Kissinger, T. O. H. Charrett, and R. P. Tatam.
+      "Range-resolved interferometric signal processing using sinusoidal optical frequency modulation."
+      Optics Express, 23(7):9415–9431, 2015.
+      <Anchor href="https://doi.org/10.1364/OE.23.009415">DOI: 10.1364/OE.23.009415</Anchor>
+    </div>
+  </li>
+</ol>
