@@ -1,6 +1,7 @@
 {
   "name": "sfm-designer",
   "version": "0.1.0",
+  "private": true,
   "homepage": "/sfm-designer",
   "license": "MPL-2.0",
   "type": "module",
