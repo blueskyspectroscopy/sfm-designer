@@ -14,7 +14,7 @@ const socialData = [
   {
     name: 'GitHub',
     id: 'github',
-    url: 'https://github.com/adamchristiansen/sfm-designer',
+    url: 'https://github.com/blueskyspectroscopy/sfm-designer',
     icon: FaGithub,
   },
 ];
@@ -35,11 +35,13 @@ export default function Footer() {
         </div>
         <div className="flex-grow-0">
           <small>
-            Copyright ©
+            ©
             {' '}
             {new Date().getFullYear()}
             {' '}
-            Adam Christiansen
+            <a href="https://blueskyspectroscopy.com/" target="_blank" rel="noopener noreferrer">
+              Blue Sky Specroscopy Inc.
+            </a>
           </small>
         </div>
       </Stack>
