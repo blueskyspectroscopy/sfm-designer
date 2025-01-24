@@ -6,6 +6,7 @@ import remarkGfm from 'remark-gfm'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/sfm-designer/',
   plugins: [
     {enforce: 'pre', ...mdx({providerImportSource: '@mdx-js/react', remarkPlugins: [remarkGfm]})},
     react({include: /\.(jsx|js|mdx|md|tsx|ts)$/}),
