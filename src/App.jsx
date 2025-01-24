@@ -1,5 +1,5 @@
 import React, { createContext, useState } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { HashRouter, Route, Routes } from 'react-router-dom';
 
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
@@ -37,7 +37,7 @@ export default function App() {
     numReflections, setNumReflections,
   };
   return (
-    <BrowserRouter>
+    <HashRouter>
       <DataContext.Provider value={dataContextValue}>
         <Container fluid>
           <Row className="min-vh-100">
@@ -57,6 +57,6 @@ export default function App() {
           </Row>
         </Container>
       </DataContext.Provider>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
